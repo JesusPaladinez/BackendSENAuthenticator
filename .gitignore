@@ -1,0 +1,49 @@
+# Entorno virtual
+.venv/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Distribución / empaquetado
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Editor de texto / IDE específico
+.vscode/
+.idea/
+*.swp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs y bases de datos temporales
+*.log
+*.sql
+*.sqlite
+
+# Caches y archivos temporales
+*.bak
+*.tmp
+*.old
+*.sublime-workspace
+
+# Configuración de ambiente local
+.env
+.env.local
