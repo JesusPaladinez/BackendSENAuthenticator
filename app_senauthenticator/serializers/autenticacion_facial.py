@@ -1,5 +1,5 @@
 from rest_framework import serializers
 
 
-class RostroSerializer(serializers.Serializer):
+class AutenticacionFacial(serializers.Serializer):
     current_face = serializers.CharField()
