@@ -14,7 +14,7 @@ class AutenticacionFacial(APIView):
     def __init__(self):
         self.face_utils = FaceUtils()
 
-    # Por el momento no se está utilzando el método conversion_a_base64, pero se podría necesitar más adelante
+    # Por el momento no se está utilizando el método conversion_a_base64, pero se podría necesitar más adelante
 
     # def conversion_a_base64(self, image: np.ndarray) -> str:
     #     # Convertir el array de NumPy a un objeto de imagen de PIL
