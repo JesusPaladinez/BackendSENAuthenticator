@@ -3,8 +3,9 @@ from rest_framework.response import Response
 from rest_framework import status
 import cv2
 import numpy as np
-from app_senauthenticator.serializers.autenticacion_facial import AutenticacionFacial
+from app_senauthenticator.serializers.autenticacion_facial import AutenticacionFacialSerializer
 from app_senauthenticator.algoritmo.process.face_processing.face_utils import FaceUtils
+from app_senauthenticator.algoritmo.process.database.config import DataBasePaths
 from PIL import Image
 from io import BytesIO
 import base64
@@ -13,30 +14,35 @@ import base64
 class AutenticacionFacial(APIView):
     def __init__(self):
         self.face_utils = FaceUtils()
+        # self.database_path = "process/database/faces" 
+        self.database = DataBasePaths()
 
-    # Por el momento no se está utilizando el método conversion_a_base64, pero se podría necesitar más adelante
 
-    # def conversion_a_base64(self, image: np.ndarray) -> str:
-    #     # Convertir el array de NumPy a un objeto de imagen de PIL
-    #     image_pil = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
-        
-    #     # Guardar la imagen en un buffer de memoria en formato PNG
-    #     buffer = BytesIO()
-    #     image_pil.save(buffer, format="PNG")
-    #     buffer.seek(0)
-        
-    #     # Codificar la imagen en base64
-    #     image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-        
-    #     return image_base64
+    def image_to_base64(self, image) -> str:
+        # Convertir el archivo de imagen a base64
+        buffer = BytesIO()
+        image.save(buffer, format="PNG")
+        buffer.seek(0)
+        return base64.b64encode(buffer.getvalue()).decode('utf-8')
 
-    def deserializar_imagen(self, image_data: str) -> np.ndarray:
+    def deserialize_image(self, image_data: str) -> np.ndarray:
         # Deserializar la imagen desde base64
         image = Image.open(BytesIO(base64.b64decode(image_data)))
         return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
 
     def post(self, request):
-        serializer = AutenticacionFacial(data=request.data)
+        # Verificar si 'current_face' es un archivo
+        current_face_file = request.FILES.get('current_face')
+
+        if current_face_file:
+            # Convertir el archivo a base64
+            image = Image.open(current_face_file)
+            current_face_data = self.image_to_base64(image)
+
+            # Reemplazar 'current_face' en los datos del request
+            request.data['current_face'] = current_face_data
+
+        serializer = AutenticacionFacialSerializer(data=request.data)
         if serializer.is_valid():
             current_face_data = serializer.validated_data['current_face']
 
@@ -62,3 +68,4 @@ class AutenticacionFacial(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
