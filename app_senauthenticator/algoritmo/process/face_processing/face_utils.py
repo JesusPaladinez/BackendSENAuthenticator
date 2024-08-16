@@ -3,9 +3,9 @@ import numpy as np
 import cv2
 import datetime
 from typing import List, Tuple, Any
-from process.face_processing.face_detect import FaceDetectMediapipe
-from process.face_processing.face_mesh import FaceMeshMediapipe
-from process.face_processing.face_matcher import FaceMatcherModel
+from .face_detect import FaceDetectMediapipe
+from .face_mesh import FaceMeshMediapipe
+from .face_matcher import FaceMatcherModel
 
 
 class FaceUtils:
