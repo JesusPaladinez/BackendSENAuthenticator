@@ -17,7 +17,6 @@ class AutenticacionFacial(APIView):
         # self.database_path = "process/database/faces" 
         self.database = DataBasePaths()
 
-
     def image_to_base64(self, image) -> str:
         # Convertir el archivo de imagen a base64
         buffer = BytesIO()
