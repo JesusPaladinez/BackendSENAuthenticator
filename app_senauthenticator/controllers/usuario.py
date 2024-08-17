@@ -80,7 +80,7 @@ def usuario_controlador(request, pk=None): # La función contiene dos parámetro
 @api_view(['POST']) # Se utiliza el método POST para enviar las credenciales del usuario al servidor 
 def inicio_sesion(request):
     try:        
-        user = Usuario.objects.get(numero_documento_usuario=request.data['numero_documento_usuario']) # Se intenta obtener el usuario mediante el número de documento
+        user = Usuario.objects.get(numero_documento_usuario=request.data['numero_documento_usuario']) # Se obtiene el usuario mediante el número de documento
         
         # Si la contraseña es inválida
         if not user.check_password(request.data['password']): # La función check_password() compara un string con un dato encriptado, en este caso la contraseña recien ingresada, con la contraseña encriptada guardada en la base de datos
@@ -101,7 +101,10 @@ def inicio_sesion(request):
 @authentication_classes([TokenAuthentication]) # Se utiliza autenticación por token
 @permission_classes([IsAuthenticated]) # Se requiere que el usuario esté autenticado
 def perfil(request):
+    try:
+        serializer = UsuarioSerializer(instance=request.user) # Se serializa los datos del usuario
 
-    serializer = UsuarioSerializer(instance=request.user) # Se serializa los datos del usuario
-
-    return Response(f'El usuario {serializer.data["first_name"]} {serializer.data["last_name"]} está activo en el sistema.')
+        # return Response(f'El usuario {serializer.data["first_name"]} {serializer.data["last_name"]} está activo en el sistema.')
+        return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
