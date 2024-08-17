@@ -101,7 +101,10 @@ def inicio_sesion(request):
 @authentication_classes([TokenAuthentication]) # Se utiliza autenticación por token
 @permission_classes([IsAuthenticated]) # Se requiere que el usuario esté autenticado
 def perfil(request):
+    try:
+        serializer = UsuarioSerializer(instance=request.user) # Se serializa los datos del usuario
 
-    serializer = UsuarioSerializer(instance=request.user) # Se serializa los datos del usuario
-
-    return Response(f'El usuario {serializer.data["first_name"]} {serializer.data["last_name"]} está activo en el sistema.')
+        # return Response(f'El usuario {serializer.data["first_name"]} {serializer.data["last_name"]} está activo en el sistema.')
+        return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
