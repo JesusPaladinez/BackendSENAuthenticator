@@ -1,5 +1,6 @@
 # Entorno virtual
 .venv/
+entorno
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
