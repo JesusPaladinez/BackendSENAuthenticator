@@ -15,11 +15,11 @@ class UsuarioSerializer(serializers.ModelSerializer):
         extra_kwargs = { 
             'tipo_documento_usuario': {'required': True},
             'numero_documento_usuario': {'required': True},
-            'genero_usuario': {'required': True},
-            'rol_usuario': {'required': True},
+            'genero_usuario': {'required': False},
+            'rol_usuario': {'required': False},
             'ficha_usuario': {'required': False},
             'first_name': {'required': True},
-            'last_name': {'required': True},
+            'last_name': {'required': False},
             'email': {'required': True},
             'password': {'required': True},
         } 
