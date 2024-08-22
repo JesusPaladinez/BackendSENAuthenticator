@@ -2,6 +2,9 @@
 .venv/
 entorno
 
+# Ignorar el archivo .json con credenciales de Google
+app_senauthenticator/controllers/almacenamiento_imagenes/clave_cuenta_servicio.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
