@@ -3,21 +3,20 @@ from django.contrib.auth.models import AbstractUser
 
 
 tipo_documento_usuario=[
-    ('Cedula de ciudadania','Cedula de ciudadania'),
-    ('Tarjeta de Identidad','Tarjeta de Identidad'),
-    ('Cedula de extranjeria','Cedula de extranjeria'),
+    ('Cédula de ciudadanía','Cédula de ciudadanía'),
+    ('Tarjeta de identidad','Tarjeta de identidad'),
+    ('Cédula de extranjería','Cédula de extranjería'),
 ]
 
 tipo_documento_tutor=[
-    ('Cedula de ciudadania','Cedula de ciudadania'),
-    ('Cedula de extranjeria','Cedula de extranjeria'),
+    ('Cédula de ciudadanía','Cédula de ciudadanía'),
+    ('Cédula de extranjería','Cédula de extranjería'),
 ]
 
 tipo_rol=[
     ('Aprendiz','Aprendiz'),
     ('Instructor','Instructor'),
     ('Administrador','Administrador'),
-    ('Funcionario','Funcionario'),
     ('Guardia de seguridad','Guardia de seguridad'),
     ('Usuario','Usuario'),
 ]
@@ -29,8 +28,8 @@ jornada_ficha=[
 ]
 
 tipo_formacion=[
-    ('Tecnologo','Tecnologo'),
-    ('Tecnico','Tecnico'),
+    ('Tecnólogo','Tecnólogo'),
+    ('Técnico','Técnico'),
 ]
 
 genero = [
