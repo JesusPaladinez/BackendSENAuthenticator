@@ -1,21 +1,24 @@
-FROM continuumio/miniconda3
+# Usa una imagen base de Python (por ejemplo, Python 3.10)
+FROM python:3.10-slim
 
-# Crear un ambiente de conda para el proyecto
-RUN conda create -n myenv python=3.10 dlib -c conda-forge
-
-# Activar el ambiente
-SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
-
-# Copiar archivos del proyecto
+# Establece el directorio de trabajo en el contenedor
 WORKDIR /app
-COPY . /app
 
-# Instalar otras dependencias
+# Copia el archivo de requerimientos al contenedor
+COPY requirements.txt .
+
+# Instala las dependencias usando pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Ejecutar comandos de migración y recolectar archivos estáticos
+# Copia el resto del código de la aplicación al contenedor
+COPY . .
+
+# Ejecuta los comandos de migración y recolecta archivos estáticos
 RUN python manage.py migrate
 RUN python manage.py collectstatic --noinput
+
+# Expone el puerto en el que Gunicorn se ejecutará
+EXPOSE 8000
 
 # Comando para iniciar la aplicación con Gunicorn
 CMD ["gunicorn", "proyecto_senauthenticator.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
