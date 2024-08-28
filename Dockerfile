@@ -10,6 +10,9 @@ COPY requirements.txt .
 # Instala las dependencias usando pip
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Instala Gunicorn explícitamente en caso de que no se haya instalado desde requirements.txt
+RUN pip install gunicorn
+
 # Copia el resto del código de la aplicación al contenedor
 COPY . .
 
