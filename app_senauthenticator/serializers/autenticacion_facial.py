@@ -1,5 +1,5 @@
 from rest_framework import serializers
 
 
-class AutenticacionFacialSerializer(serializers.Serializer):
-    current_face = serializers.CharField()
+class FaceLoginSerializer(serializers.Serializer):
+    face_login = serializers.CharField()
