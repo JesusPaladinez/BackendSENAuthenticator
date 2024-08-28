@@ -1,8 +1,14 @@
-# Actualiza pip y setuptools a la última versión
+# Actualiza pip y setuptools
 pip install --upgrade pip setuptools
 
-# Instala las dependencias del sistema necesarias para compilar dlib y otras librerías
+# Instala primero las dependencias críticas del sistema
 apt-get update && apt-get install -y build-essential cmake
 
-# Instala las dependencias desde requirements.txt, migra la base de datos y carga los estilos
-pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+# Instala dlib desde un repositorio para disminuir el consumo de memoria RAM
+pip install dlib --find-links https://pypi.anaconda.org/menpo/simple
+
+# Luego instala el resto de las dependencias
+pip install -r requirements.txt
+
+# Migraciones y archivos estáticos
+python manage.py migrate && python manage.py collectstatic --noinput
