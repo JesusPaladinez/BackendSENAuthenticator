@@ -112,3 +112,13 @@ class Tutor(models.Model):
 
     def __str__(self) -> str:
         return f'{self.nombre_tutor} {self.apellido_tutor}'
+
+
+import uuid
+class PasswordReset(models.Model):
+    usuario=models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='usuario')
+    reset_id=models.UUIDField(default=uuid.uuid4,unique=True,editable=False)
+    created_when=models.DataTimeField(auto_now_add=True)
+    
+    def _str_(self):
+        return f"password reset for {self.usuario.username} with name {self.usuario.first_name}  at {self.created_when}"
