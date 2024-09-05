@@ -1,6 +1,7 @@
 from django.urls import path
-from app_senauthenticator.controllers import programa, ficha, usuario, registro_facial, objeto, ingreso, tutor
-from app_senauthenticator.controllers.autenticacion_facial import InicioSesionFacial, RegistroFacial
+from app_senauthenticator.controllers import programa, ficha, usuario, objeto, ingreso, tutor
+from app_senauthenticator.controllers.registro_facial import RegistroFacial
+from app_senauthenticator.controllers.inicio_sesion_facial import InicioSesionFacial
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -12,8 +13,6 @@ urlpatterns = [
     path('ficha/<int:pk>/', ficha.ficha_controlador),
     path('usuario/', usuario.usuario_controlador),
     path('usuario/<int:pk>/', usuario.usuario_controlador),
-    # path('registroFacial/', registro_facial.registro_facial_controlador),
-    # path('registroFacial/<int:pk>/', registro_facial.registro_facial_controlador),
     path('objeto/', objeto.objeto_controlador),
     path('objeto/<int:pk>/', objeto.objeto_controlador),
     path('tutor/', tutor.tutor_controlador),
@@ -24,7 +23,6 @@ urlpatterns = [
     path('perfil/', usuario.perfil),
     path('inicioSesionFacial/', InicioSesionFacial.as_view()),
     path('registroFacial/', RegistroFacial.as_view()),
-    # path('autenticacionFacial/', AutenticacionFacial.as_view())
 ]
 
 

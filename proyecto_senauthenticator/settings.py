@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-*dhg)w2)u_k6d)(5n)ihfqen*wp#jy6f=e8%2(z!=nipbwrr)^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backendsenauthenticator.onrender.com']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -43,11 +43,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'coreapi', # módulo para documentar el código    
+    'whitenoise.runserver_nostatic', # Módulo para subir archivos estaticos 
     'app_senauthenticator', 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -82,13 +84,13 @@ WSGI_APPLICATION = 'proyecto_senauthenticator.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'djongo',
-    #     'NAME': 'db_senauthenticator',     
-    #     'CLIENT': {
-    #         'host': 'mongodb+srv://adso:2669742@cluster0.vhvbcg7.mongodb.net/db_senauthenticator?retryWrites=true&w=majority&appName=Cluster0'
-    #     },        
-    # },
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'db_senauthenticator',     
+        'CLIENT': {
+            'host': os.getenv('MONGODB_URI')
+        },        
+    },
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
@@ -137,6 +139,7 @@ AUTH_USER_MODEL = 'app_senauthenticator.Usuario'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -147,13 +150,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Permite todas las solicitudes de todos los dominios
+# Permite las solicitudes de todos los dominios
 CORS_ALLOW_ALL_ORIGINS = True
-
-# autoriza rutas para poderse ejecutar (en este caso la de Next.js y la de Flutter)
-CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
 
 # Configuración de esquema para que django rest framework y coreapi puedan documentar el código
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
 }
+
+CSRF_TRUSTED_ORIGINS=['']

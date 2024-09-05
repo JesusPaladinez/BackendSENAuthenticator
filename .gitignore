@@ -1,6 +1,7 @@
 # Entorno virtual
 .venv/
 entorno
+venv/
 
 # Ignorar el archivo .json con credenciales de Google
 app_senauthenticator/controllers/almacenamiento_imagenes/clave_cuenta_servicio.json
@@ -51,3 +52,6 @@ Thumbs.db
 # Configuración de ambiente local
 .env
 .env.local
+
+# Carpeta estatica con los estilos
+static/
