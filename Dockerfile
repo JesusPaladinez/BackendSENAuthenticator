@@ -22,7 +22,7 @@ RUN . /opt/venv/bin/activate && pip install --upgrade pip
 COPY . /Backend/.
 
 # Instalar las dependencias de Python desde el archivo requirements.txt
-RUN . /opt/venv/bin/activate && pip install -r requirements.txt
+RUN . /opt/venv/bin/activate && pip install -r /Backend/requirements.txt
 
 # Comando para iniciar la aplicación utilizando la variable PORT de Railway
-CMD ["/opt/venv/bin/python", "manage.py", "runserver", "0.0.0.0:${PORT}"]
+CMD ["/opt/venv/bin/python", "/Backend/manage.py", "runserver", "0.0.0.0:${PORT}"]
