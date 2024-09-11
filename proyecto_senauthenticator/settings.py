@@ -85,6 +85,10 @@ WSGI_APPLICATION = 'proyecto_senauthenticator.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # },
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'db_senauthenticator',     
@@ -92,13 +96,9 @@ DATABASES = {
             'host': os.getenv('MONGODB_URI')
         },        
     },
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
 }
 
-DATABASES['default'] = dj_database_url.parse('postgresql://senauthenticator_db_user:HzgcdQW5w9KPfPaaidk74wdWinVs4xin@dpg-cr4897bv2p9s73cnv3gg-a.oregon-postgres.render.com/senauthenticator_db')
+# DATABASES['default'] = dj_database_url.parse('postgresql://senauthenticator_db_user:HzgcdQW5w9KPfPaaidk74wdWinVs4xin@dpg-cr4897bv2p9s73cnv3gg-a.oregon-postgres.render.com/senauthenticator_db')
 
 
 # Password validation
