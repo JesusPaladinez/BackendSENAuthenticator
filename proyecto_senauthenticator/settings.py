@@ -27,6 +27,7 @@ SECRET_KEY = 'django-insecure-*dhg)w2)u_k6d)(5n)ihfqen*wp#jy6f=e8%2(z!=nipbwrr)^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Permite alojar el proyecto en todos los dominios
 ALLOWED_HOSTS = ['*']
 
 
@@ -158,4 +159,8 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
 }
 
-CSRF_TRUSTED_ORIGINS=['']
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost',
+    'http://127.0.0.1',
+    'https://tudominio.com'
+]

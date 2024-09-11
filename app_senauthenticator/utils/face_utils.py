@@ -7,6 +7,7 @@ from ..utils.face_matcher import face_matching_face_recognition_model
 import base64
 from io import BytesIO
 from PIL import Image
+import dlib
 
     
 # Convertir el archivo de imagen a base64
@@ -31,14 +32,45 @@ def convert_to_ndarray(image_file) -> np.ndarray:
 
 # Detectar el rostro 
 def detect_face(image):
-        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray_image, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-        
-        if len(faces) == 0:
-            return None
-        
-        return faces[0]  # Devolver el primer rostro detectado
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    
+    # Conversión a escala de grises
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # Ajusta los parámetros para hacer el detector más o menos sensible
+    faces = face_cascade.detectMultiScale(
+        gray_image, 
+        scaleFactor=1.05,  # Escala más pequeña para más precisión
+        minNeighbors=3,  # Reducir vecinos para detectar más rostros
+        minSize=(50, 50)  # Aumentar el tamaño mínimo del rostro detectado
+    )
+
+    print(f"Rostros detectados: {faces}")
+    
+    if len(faces) == 0:
+        return None
+    
+    return faces[0]
+
+
+# Inicializar el detector de rostros de Dlib
+face_detector = dlib.get_frontal_face_detector()
+
+def detect_face_dlib(image):
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # Detectar rostros con Dlib
+    faces = face_detector(gray_image, 1)
+    
+    if len(faces) == 0:
+        print("No se detectó ningún rostro con dlib.")
+        return None
+    else:
+        print("Rostro detectado con dlib.")
+    
+    # Convertir los rostros detectados a un formato compatible (x, y, w, h)
+    face = faces[0]
+    return (face.left(), face.top(), face.width(), face.height())
 
 
 # Recortar el rostro detectado
