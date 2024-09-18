@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y \
     cmake \
     libopenblas-dev \
     liblapack-dev \
-    libx11-dev
+    libx11-dev \
+    # Instalar bash para el script de inicio
+    bash
 
 # Crear un entorno virtual
 RUN python -m venv /opt/venv
@@ -24,5 +26,9 @@ COPY . /Backend/.
 # Instalar las dependencias de Python desde el archivo requirements.txt
 RUN . /opt/venv/bin/activate && pip install -r /Backend/requirements.txt
 
-# Comando para iniciar la aplicación utilizando la variable PORT de Railway
-CMD ["/opt/venv/bin/python", "/Backend/manage.py", "runserver", "0.0.0.0:${PORT}"]
+# Copiar el script de inicio y darle permisos de ejecución
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Comando para iniciar la aplicación utilizando el script de inicio
+CMD ["/start.sh"]

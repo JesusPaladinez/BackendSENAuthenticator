@@ -120,6 +120,7 @@ def face_matching(current_face: np.ndarray, face_db: List[np.ndarray], name_db: 
     return False, 'Rostro desconocido'
 
 
+# Bitacora de registro
 def user_check_in(self, user_name: str, user_path: str):
     if not self.user_registered:
         now = datetime.datetime.now()
@@ -128,5 +129,5 @@ def user_check_in(self, user_name: str, user_path: str):
         with open(user_file_path, "a")as user_file:
             user_file.write(f'\nAccedió el: {date_time}\n')
 
-        self.user_registered = True
+        self.user_registered = True        
     
