@@ -120,8 +120,8 @@ def face_matching(current_face: np.ndarray, face_db: List[np.ndarray], name_db: 
     return False, 'Rostro desconocido'
 
 
-# Bitacora de registro
-def user_check_in(self, user_name: str, user_path: str):
+# Registro de ingreso de usuario
+def user_login_record(self, user_name: str, user_path: str):
     if not self.user_registered:
         now = datetime.datetime.now()
         date_time = now.strftime("%Y-%m-%d a las %H:%M:%S")

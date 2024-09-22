@@ -85,15 +85,12 @@ WSGI_APPLICATION = 'proyecto_senauthenticator.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # },
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'db_senauthenticator',     
         'CLIENT': {
-            'host': os.getenv('MONGODB_URI')
+            'host': os.getenv('MONGODB_URI'),
+            'serverSelectionTimeoutMS': 5000 # 5 segundos de espera
         },        
     },
 }

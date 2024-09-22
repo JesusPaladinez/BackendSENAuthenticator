@@ -1,0 +1,33 @@
+# Ignorar entornos virtuales
+.venv/
+.vscode/
+.idea/
+.vs/
+
+# Ignorar archivos de configuración local
+.env
+*.env
+
+# Ignorar archivos y carpetas generadas por el sistema
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorar logs y archivos de depuración
+*.log
+debug.log
+
+# Ignorar archivos estáticos generados (si se generan en el entorno local)
+staticfiles/
+static/
+media/
+
+# Ignorar datos y caché
+*.sqlite3
+*.db
+*.cache
+
+# Ignorar archivos específicos de versiones de control
+*.git
+*.gitignore
