@@ -18,7 +18,7 @@ __pycache__/
 *.log
 debug.log
 
-# Ignorar archivos estáticos generados (si se generan en el entorno local)
+# Ignorar archivos estáticos generados
 staticfiles/
 static/
 media/
@@ -31,3 +31,8 @@ media/
 # Ignorar archivos específicos de versiones de control
 *.git
 *.gitignore
+
+
+
+
+

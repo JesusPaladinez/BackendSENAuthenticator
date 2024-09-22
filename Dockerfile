@@ -32,3 +32,6 @@ RUN chmod +x /start.sh
 
 # Comando para iniciar la aplicación utilizando el script de inicio
 CMD ["/start.sh"]
+
+
+
