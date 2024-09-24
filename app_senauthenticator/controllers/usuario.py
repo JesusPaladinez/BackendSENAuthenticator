@@ -1,15 +1,17 @@
+# Librerías para registrar los datos del usuario
 from rest_framework_simplejwt.tokens import RefreshToken  # Importar JWT
 from app_senauthenticator.models import Usuario
 from app_senauthenticator.serializers.usuario import UsuarioSerializer
 from rest_framework.response import Response
 from rest_framework import status
-
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import api_view, authentication_classes
-
+# Librerías para el reconocimiento facial
+from app_senauthenticator.utils.face_utils import convert_to_ndarray, detect_face_dlib, crop_face
+import os
+import cv2
+import numpy as np
 
 
 
@@ -65,35 +67,67 @@ def usuario_controlador(request, pk=None):
         # Solicitud para crear un nuevo objeto
         elif request.method == 'POST':
             try:
-                serializer = UsuarioSerializer(data=request.data)  # Serializar el objeto recibido
-
-                if serializer.is_valid():
-                    serializer.save()
-
-                    user = Usuario.objects.get(numero_documento_usuario=serializer.data['numero_documento_usuario'])
-                    user.set_password(serializer.data['password'])  # Encriptar la contraseña
-                    user.save()
+                usuario_serializer = UsuarioSerializer(data=request.data)
+                if usuario_serializer.is_valid():
+                    # Guardar el usuario
+                    usuario = usuario_serializer.save()
+                    usuario.set_password(request.data['password'])  # Encriptar la contraseña
+                    usuario.save()
 
                     # Generar los tokens JWT
-                    refresh = RefreshToken.for_user(user)
+                    refresh = RefreshToken.for_user(usuario)
                     access_token = str(refresh.access_token)
-                    # refresh_token = str(refresh)
 
                     # Crear la respuesta con los tokens en cookies
-                    response = Response({'usuario': serializer.data}, status=status.HTTP_201_CREATED)
-
-                    # Guardar los tokens en las cookies
+                    response = Response({'usuario': usuario_serializer.data}, status=status.HTTP_201_CREATED)
                     response.set_cookie(
                         key='jwt-access',
-                        value= access_token,
+                        value=access_token,
                         httponly=True,
-                        secure= True,  # Cambiar a True en producción(https)y false para desarrollo(http)
-                        samesite='None'  # Cambiar según configuración de dominio
+                        secure=True,
+                        samesite='None'
                     )
 
-                    return response
+                    # Procesar el registro facial si se proporciona una imagen
+                    if 'face_register' in request.data:
+                        face_register = request.data['face_register']
+                        nombre_completo = usuario_serializer.validated_data.get('first_name') + " " + usuario_serializer.validated_data.get('last_name')
+                        # numero_documento = usuario_serializer.validated_data.get('numero_documento_usuario')                        
 
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                        try:
+                            # Convertir la imagen a ndarray
+                            face_ndarray = convert_to_ndarray(face_register)
+                            
+                            # Detectar el rostro en la imagen
+                            face_detected = detect_face_dlib(face_ndarray)
+                            if face_detected is None:
+                                raise ValueError("No se detectó ningún rostro en la imagen proporcionada.")
+                            
+                            # Recortar el rostro detectado
+                            cropped_face = crop_face(face_ndarray, face_detected)
+
+                            # Guardar la imagen final en formato PNG
+                            BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                            face_directory = os.path.join(BASE_DIR, 'database', 'faces')
+                            os.makedirs(face_directory, exist_ok=True)
+                            face_filename = f"{nombre_completo}.png"
+                            face_path = os.path.join(face_directory, face_filename)
+                            cv2.imwrite(face_path, cropped_face)
+
+                            # Guardar la imagen en formato ndarray en la carpeta 'matrices'
+                            matrices_directory = os.path.join(BASE_DIR, 'database', 'matrices')
+                            os.makedirs(matrices_directory, exist_ok=True)
+                            matrix_filename = f"{nombre_completo}.npy"
+                            matrix_path = os.path.join(matrices_directory, matrix_filename)
+                            np.save(matrix_path, face_ndarray)
+
+                        except Exception as e:
+                            print(f"Error al registrar el rostro: {str(e)}")
+                            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+                    return response
+                else:
+                    return Response(usuario_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
