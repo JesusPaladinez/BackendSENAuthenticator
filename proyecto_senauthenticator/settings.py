@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +28,8 @@ SECRET_KEY = 'django-insecure-*dhg)w2)u_k6d)(5n)ihfqen*wp#jy6f=e8%2(z!=nipbwrr)^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'backendsenauthenticator.onrender.com']
+# Permite alojar el proyecto en todos los dominios
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -42,11 +45,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'coreapi', # módulo para documentar el código    
+    'whitenoise.runserver_nostatic', # Módulo para subir archivos estaticos 
     'app_senauthenticator', 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    #  Este middleware extrae el token jwt-access de las cookies en cada solicitud y lo coloca en la cabecera de autorización para que Django
+    'app_senauthenticator.middleware.JWTAuthFromCookieMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -54,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'proyecto_senauthenticator.urls'
@@ -97,6 +104,8 @@ DATABASES = {
     }
 }
 
+DATABASES ["default"] = dj_database_url.parse('postgresql://senauthenticator_db_9c5c_user:aGE65xoUeYsYciQ8Qrw9nfAN08Ybhyip@dpg-crovmqdds78s73d2h69g-a.oregon-postgres.render.com/senauthenticator_db_9c5c')
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -137,6 +146,7 @@ AUTH_USER_MODEL = 'app_senauthenticator.Usuario'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -147,19 +157,28 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Permite todas las solicitudes de todos los dominios
+# Permite todas las solicitudes de todos los dominios(esto puede ser inseguro para producción)
 CORS_ALLOW_ALL_ORIGINS = True
 
+
 # autoriza rutas para poderse ejecutar (en este caso la de Next.js y la de Flutter)
-CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # URL del frontend en desarrollo
+    'http://localhost:5173',
+    
+    'https://backendsenauthenticator.onrender.com',  # URL de producción
+    'https://backprojecto.onrender.com',
+    'https://senauthenticator.onrender.com',
+]
 
 # Configuración de esquema para que django rest framework y coreapi puedan documentar el código
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
 }
 
-EMAIL_HOST="smtp.gmail.com"
-EMAIL_PORT=465
-EMAIL_USE_SSL=True
-EMAIL_HOST_USER="destroyemacasta@gmail.com"
-EMAIL_HOST_PASSWORD="whxc aech qeyc ncfw"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER ='moto.emacasta12@gmail.com'
+EMAIL_HOST_PASSWORD ='aytyfmpcczisphrd'
