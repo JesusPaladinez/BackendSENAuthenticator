@@ -85,14 +85,7 @@ WSGI_APPLICATION = 'proyecto_senauthenticator.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'db_senauthenticator',     
-        'CLIENT': {
-            'host': os.getenv('MONGODB_URI'),
-            'serverSelectionTimeoutMS': 5000 # 5 segundos de espera
-        },        
-    },
+    'default': os.getenv('DATABASE_URL'),
 }
 
 # DATABASES['default'] = dj_database_url.parse('postgresql://senauthenticator_db_user:HzgcdQW5w9KPfPaaidk74wdWinVs4xin@dpg-cr4897bv2p9s73cnv3gg-a.oregon-postgres.render.com/senauthenticator_db')
