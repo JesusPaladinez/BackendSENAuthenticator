@@ -82,6 +82,13 @@ class RegistroFacial(models.Model):
     usuario_registro_facial=models.ForeignKey(Usuario, on_delete=models.PROTECT, null=True, db_column='usuario_registro_facial')
 
 
+class Oficina(models.Model):
+    nombre_oficina=models.CharField(max_length=40, db_column='nombre_oficina')
+
+    def __str__(self) -> str:
+        return f'{self.nombre_oficina}'
+
+
 class Ingreso(models.Model):
     datos_biometricos_ingreso=models.ImageField(upload_to=f'datos_biometricos_ingreso', db_column='datos_biometricos_ingreso')    
     fecha_hora_ingreso=models.DateTimeField(auto_now_add=True, db_column='fecha_hora_ingreso')

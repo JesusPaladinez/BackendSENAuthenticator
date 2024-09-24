@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -50,7 +51,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    #  Este middleware extrae el token jwt-access de las cookies en cada solicitud y lo coloca en la cabecera de autorización para que Django
+    'app_senauthenticator.middleware.JWTAuthFromCookieMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -58,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'proyecto_senauthenticator.urls'
@@ -85,10 +88,14 @@ WSGI_APPLICATION = 'proyecto_senauthenticator.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': os.getenv('DATABASE_URL'),
+        'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    # 'default': os.getenv('DATABASE_URL'),
 }
 
-# DATABASES['default'] = dj_database_url.parse('postgresql://senauthenticator_db_user:HzgcdQW5w9KPfPaaidk74wdWinVs4xin@dpg-cr4897bv2p9s73cnv3gg-a.oregon-postgres.render.com/senauthenticator_db')
+DATABASES ["default"] = dj_database_url.parse('postgresql://senauthenticator_db_9c5c_user:aGE65xoUeYsYciQ8Qrw9nfAN08Ybhyip@dpg-crovmqdds78s73d2h69g-a.oregon-postgres.render.com/senauthenticator_db_9c5c')
 
 
 # Password validation
@@ -141,15 +148,46 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Permite las solicitudes de todos los dominios
+# Permite todas las solicitudes de todos los dominios(esto puede ser inseguro para producción)
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+# autoriza rutas para poderse ejecutar (en este caso la de Next.js y la de Flutter)
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',  # URL del frontend en desarrollo
+    'http://localhost:5173',
+    
+    'https://backendsenauthenticator.onrender.com',  # URL de producción
+    'https://backprojecto.onrender.com',
+    'https://senauthenticator.onrender.com',
+]
 
 # Configuración de esquema para que django rest framework y coreapi puedan documentar el código
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+    
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+} 
+
+# Configurar las cookies de JWT
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  #timedelta(minutes=5) Ajusta el tiempo según tu necesidad
+    # 'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_COOKIE': 'jwt-access',  # Nombre de la cookie del token de acceso
+    'AUTH_COOKIE_REFRESH': 'jwt-refresh',  # Nombre de la cookie del token de refresh
+    'AUTH_COOKIE_SECURE': True,  # Cambiar a True en producción para HTTPS
+    'AUTH_COOKIE_HTTP_ONLY': True, # Cuando httponly está configurado como true, significa que la cookie solo puede ser accedida por el navegador y no por scripts del lado del cliente (como JavaScript).
+    'AUTH_COOKIE_SAMESITE': 'None', # para usar AUTH_COOKIE_SAMESITE:'none', AUTH_COOKIE_SECURE debe estar en True en producción
+   
 }
 
-CSRF_TRUSTED_ORIGINS = [
-    'http://*',
-    'https://tudominio.com'
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:5173/',  # URL del frontend
 ]
