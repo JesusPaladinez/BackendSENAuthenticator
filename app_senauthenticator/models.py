@@ -61,7 +61,7 @@ class Usuario(AbstractUser):
     tipo_documento_usuario=models.CharField(max_length=50, choices=tipo_documento_usuario, default='Cedula de ciudadania', db_column='tipo_documento_usuario')
     numero_documento_usuario=models.CharField(max_length=20, unique=True, db_column='numero_documento_usuario')
     genero_usuario=models.CharField(max_length=9, choices=genero, blank=True, null=True, db_column='genero_usuario')  
-    rol_usuario = models.CharField(max_length=20, choices=tipo_rol, blank=True, null=True, default='Usuario', db_column='rol_usuario') 
+    rol_usuario = models.CharField(max_length=20, choices=tipo_rol, blank=True, null=True, db_column='rol_usuario') 
     ficha_usuario=models.ForeignKey(Ficha, on_delete=models.PROTECT, blank=True, null=True, db_column='ficha_usuario')
     face_register = models.ImageField(blank=True, null=True)
     # nombre_usuario=models.CharField(max_length=50, db_column='nombre_usuario')

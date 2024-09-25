@@ -30,7 +30,7 @@ urlpatterns = [
     # Ingreso
     path('ingresos/', ingreso.ingreso_controlador, name="cont_ingreso"),
     path('ingresos/<int:pk>/', ingreso.ingreso_controlador, name="cont_ingreso"),
-    # Registro Facial
+    # Reconocimiento Facial
     path('inicio-sesion-facial/', InicioSesionFacial.as_view()),
     path('registro-facial/', RegistroFacial.as_view()),
 ]
