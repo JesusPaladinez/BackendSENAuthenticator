@@ -13,6 +13,19 @@ import os
 import cv2
 import numpy as np
 
+#  Importaciones Recuperar contraseña
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import api_view, authentication_classes
+from django.contrib import messages
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.utils import timezone
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+
+
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def usuario_controlador(request, pk=None):
