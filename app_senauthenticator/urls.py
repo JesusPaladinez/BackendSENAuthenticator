@@ -1,6 +1,7 @@
 from django.urls import path
 from app_senauthenticator.controllers import programa, ficha, usuario, objeto, ingreso, tutor, oficina, usuarioExterno
 
+from app_senauthenticator.controllers.usuarioExterno import UsuarioExterno
 from app_senauthenticator.controllers.registro_facial import RegistroFacial
 from app_senauthenticator.controllers.inicio_sesion_facial import InicioSesionFacial
 from django.conf import settings

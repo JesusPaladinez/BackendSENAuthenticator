@@ -87,16 +87,6 @@ WSGI_APPLICATION = 'proyecto_senauthenticator.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'djongo',
-#         'NAME': 'db_senauthenticator',     
-#         'CLIENT': {
-#             'host': 'mongodb+srv://adso:2669742@cluster0.vhvbcg7.mongodb.net/db_senauthenticator?retryWrites=true&w=majority&appName=Cluster0'
-#         },        
-#     }
-# }
-
 DATABASES = {
     'default': dj_database_url.config(
         default=os.getenv('DATABASE_URL')
@@ -174,7 +164,32 @@ CORS_ALLOWED_ORIGINS = [
 # Configuración de esquema para que django rest framework y coreapi puedan documentar el código
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+    
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+} 
+
+# Configurar las cookies de JWT
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  #timedelta(minutes=5) Ajusta el tiempo según tu necesidad
+    # 'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_COOKIE': 'jwt-access',  # Nombre de la cookie del token de acceso
+    'AUTH_COOKIE_REFRESH': 'jwt-refresh',  # Nombre de la cookie del token de refresh
+    'AUTH_COOKIE_SECURE': True,  # Cambiar a True en producción para HTTPS
+    'AUTH_COOKIE_HTTP_ONLY': True, # Cuando httponly está configurado como true, significa que la cookie solo puede ser accedida por el navegador y no por scripts del lado del cliente (como JavaScript).
+    'AUTH_COOKIE_SAMESITE': 'None', # para usar AUTH_COOKIE_SAMESITE:'none', AUTH_COOKIE_SECURE debe estar en True en producción
+   
 }
+
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:5173/',  # URL del frontend
+]
+
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
