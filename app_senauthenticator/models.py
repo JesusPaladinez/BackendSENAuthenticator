@@ -75,12 +75,12 @@ class Usuario(AbstractUser):
 
     groups = models.ManyToManyField(
         Group,
-        related_name='usuario_set',  # Cambia esto
+        related_name='usuario_set',  
         blank=True
     )
     user_permissions = models.ManyToManyField(
         Permission,
-        related_name='usuario_permissions_set',  # Cambia esto
+        related_name='usuario_permissions_set',  
         blank=True
     )
 
@@ -111,12 +111,12 @@ class UsuarioExterno(AbstractUser):
 
     groups = models.ManyToManyField(
         Group,
-        related_name='usuarioexterno_set',  # Cambia esto
+        related_name='usuarioexterno_set',  
         blank=True
     )
     user_permissions = models.ManyToManyField(
         Permission,
-        related_name='usuarioexterno_permissions_set',  # Cambia esto
+        related_name='usuarioexterno_permissions_set', 
         blank=True
     )
 
