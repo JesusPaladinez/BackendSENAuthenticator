@@ -63,6 +63,7 @@ class Usuario(AbstractUser):
     genero_usuario=models.CharField(max_length=9, choices=genero, db_column='genero_usuario')  
     rol_usuario = models.CharField(max_length=20, choices=tipo_rol, default='Usuario', db_column='rol_usuario') 
     ficha_usuario=models.ForeignKey(Ficha, on_delete=models.PROTECT, null=True, db_column='ficha_usuario')
+    face_register = models.ImageField()
     # nombre_usuario=models.CharField(max_length=50, db_column='nombre_usuario')
     # apellidos_usuario=models.CharField(max_length=50, db_column='apellidos_usuario')
     # correo_usuario=models.CharField(max_length=50, db_column='correo_personal_usuario') 
@@ -96,11 +97,11 @@ class Ingreso(models.Model):
 
 
 class Objeto(models.Model):
-    marca_objeto=models.CharField(max_length=20, db_column='marca_objeto')
-    modelo_objeto=models.CharField(max_length=20, db_column='modelo_objeto')
-    descripcion_objeto=models.TextField(max_length=1000, db_column='descripcion_objeto')
-    foto_objeto=models.ImageField(upload_to=f"foto_objeto", db_column='foto_objeto')
-    usuario_objeto=models.ForeignKey(Usuario, on_delete=models.PROTECT, null=True, db_column='usuario_objeto')
+    marca_objeto = models.CharField(max_length=20, db_column='marca_objeto')
+    modelo_objeto = models.CharField(max_length=20, db_column='modelo_objeto')
+    descripcion_objeto = models.TextField(db_column='descripcion_objeto')
+    foto_objeto = models.URLField(max_length=300,db_column='foto_objeto', blank=True, null=True)  # Guardarás la URL aquí
+    usuario_objeto = models.ForeignKey(Usuario, on_delete=models.PROTECT, db_column='usuario_objeto')
 
     def __str__(self) -> str:
         return f'{self.marca_objeto} {self.modelo_objeto}'
