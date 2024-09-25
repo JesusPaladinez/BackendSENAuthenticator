@@ -23,5 +23,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'last_name': {'required': False},
             'email': {'required': True},
             'password': {'required': True},
+            'username': {'required': False},
         } 
     
