@@ -61,14 +61,15 @@ def usuario_controlador(request, pk=None):
             # Solicitud para crear un nuevo objeto
             elif request.method == 'POST':
                 # Extraer el número de documento del request.data
-                numero_documento = request.data.get('numero_documento')
+                numero_documento = request.data.get('numero_documento_usuario')
 
-                # Crear un nuevo usuario y asignar el username
+                # Asignar el número de documento al campo username en el request.data
+                request.data['username'] = numero_documento
+
+                # Crear un nuevo usuario con los datos actualizados
                 usuario_serializer = UsuarioSerializer(data=request.data)
+                
                 if usuario_serializer.is_valid():
-                    # Asigna el número de documento al username
-                    usuario_serializer.validated_data['username'] = numero_documento
-                    
                     # Guardar el usuario
                     usuario = usuario_serializer.save()
                     usuario.set_password(request.data['password'])  # Encriptar la contraseña
