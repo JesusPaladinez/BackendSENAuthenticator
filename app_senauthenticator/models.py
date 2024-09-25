@@ -90,6 +90,19 @@ class Oficina(models.Model):
         return f'{self.nombre_oficina}'
 
 
+class UsuarioExterno(AbstractUser):
+    tipo_documento_usuario=models.CharField(max_length=50, choices=tipo_documento_usuario, default='Cedula de ciudadania', db_column='tipo_documento_usuario')
+    numero_documento_usuario=models.CharField(max_length=20, unique=True, db_column='numero_documento_usuario'),
+    oficina_usuario = models.ForeignKey(Oficina, on_delete=models.PROTECT, db_column='oficina')
+
+
+    REQUIRED_FIELDS = 'numero_documento_usuario' # se cambia el username por el numero_documento_usuario para poder autenticarse
+
+    def __str__(self) -> str:
+        return self.numero_documento_usuario
+    
+
+
 class Ingreso(models.Model):
     datos_biometricos_ingreso=models.ImageField(upload_to=f'datos_biometricos_ingreso', db_column='datos_biometricos_ingreso')    
     fecha_hora_ingreso=models.DateTimeField(auto_now_add=True, db_column='fecha_hora_ingreso')

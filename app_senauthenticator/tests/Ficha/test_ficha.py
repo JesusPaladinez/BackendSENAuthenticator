@@ -34,53 +34,53 @@ def test_obtener_fichas():
 #     # assert response.status_code == 400 si esta mal algo
 
 
-# @pytest.mark.django_db
-# def test_actualizar_ficha():
-#     # Crear un programa y una ficha
-#     programa = Programa.objects.create(nombre_programa='ADSO')
-#     ficha = Ficha.objects.create(
-#         numero_ficha='2669742',
-#         aprendices_matriculados_ficha=28,
-#         aprendices_actuales_ficha=23,
-#         jornada_ficha='Mañana',
-#         programa_ficha=programa
-#     )
+@pytest.mark.django_db
+def test_actualizar_ficha():
+    # Crear un programa y una ficha
+    programa = Programa.objects.create(nombre_programa='ADSO')
+    ficha = Ficha.objects.create(
+        numero_ficha='2669742',
+        aprendices_matriculados_ficha=28,
+        aprendices_actuales_ficha=23,
+        jornada_ficha='Mañana',
+        programa_ficha=programa
+    )
     
-#     client = APIClient()
-#     data = {
-#         'numero_ficha': '2669742',
-#         'aprendices_matriculados_ficha': 30,  # Actualizamos este campo
-#         'aprendices_actuales_ficha': 25,      # Y este también
-#         'jornada_ficha': 'Tarde',             # Cambiamos la jornada
-#         'programa_ficha': programa.id
-#     }
+    client = APIClient()
+    data = {
+        'numero_ficha': '2669742',
+        'aprendices_matriculados_ficha': 30,  # Actualizamos este campo
+        'aprendices_actuales_ficha': 25,      # Y este también
+        'jornada_ficha': 'Tarde',             # Cambiamos la jornada
+        'programa_ficha': programa.id
+    }
 
-#     response = client.put(reverse('cont_ficha', args=[ficha.pk]), data, format='json')
+    response = client.put(reverse('cont_ficha', args=[ficha.pk]), data, format='json')
     
-#     assert response.status_code == 200
-#     # Verificamos que los cambios se hayan aplicado
-#     ficha.refresh_from_db()
-#     assert ficha.aprendices_matriculados_ficha == 30
-#     assert ficha.aprendices_actuales_ficha == 25
-#     assert ficha.jornada_ficha == 'Tarde'
+    assert response.status_code == 200
+    # Verificamos que los cambios se hayan aplicado
+    ficha.refresh_from_db()
+    assert ficha.aprendices_matriculados_ficha == 30
+    assert ficha.aprendices_actuales_ficha == 25
+    assert ficha.jornada_ficha == 'Tarde'
 
 
-# @pytest.mark.django_db
-# def test_eliminar_ficha():
-#     programa = Programa.objects.create(nombre_programa='ADSO')
-#     ficha = Ficha.objects.create(
-#         numero_ficha='2669742',
-#         aprendices_matriculados_ficha=28,
-#         aprendices_actuales_ficha=23,
-#         jornada_ficha='Mañana',
-#         programa_ficha=programa
-#     )
+@pytest.mark.django_db
+def test_eliminar_ficha():
+    programa = Programa.objects.create(nombre_programa='ADSO')
+    ficha = Ficha.objects.create(
+        numero_ficha='2669742',
+        aprendices_matriculados_ficha=28,
+        aprendices_actuales_ficha=23,
+        jornada_ficha='Mañana',
+        programa_ficha=programa
+    )
     
-#     client = APIClient()
+    client = APIClient()
 
-#     # Hacemos la petición DELETE para eliminar la ficha
-#     response = client.delete(reverse('cont_ficha', args=[ficha.pk]))
+    # Hacemos la petición DELETE para eliminar la ficha
+    response = client.delete(reverse('cont_ficha', args=[ficha.pk]))
     
-#     assert response.status_code == 204
-#     # Verificamos que la ficha haya sido eliminada
-#     assert not Ficha.objects.filter(pk=ficha.pk).exists()
+    assert response.status_code == 204
+    # Verificamos que la ficha haya sido eliminada
+    assert not Ficha.objects.filter(pk=ficha.pk).exists()
