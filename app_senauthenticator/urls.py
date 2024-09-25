@@ -8,31 +8,31 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     # Oficina
-    path('oficina/<int:pk>/', oficina.oficina_controlador, name="cont_oficina"),
-    path('oficina/', oficina.oficina_controlador, name="cont_oficina"),
+    path('oficinas/', oficina.oficina_controlador, name="cont_oficina"),
+    path('oficinas/<int:pk>/', oficina.oficina_controlador, name="cont_oficina"),
     # Programa
-    path('programa/', programa.programa_controlador, name="cont_programa"),
-    path('programa/<int:pk>/', programa.programa_controlador, name="cont_programa"),
+    path('programas/', programa.programa_controlador, name="cont_programa"),
+    path('programas/<int:pk>/', programa.programa_controlador, name="cont_programa"),
     # Ficha
-    path('ficha/', ficha.ficha_controlador, name="cont_ficha"),
-    path('ficha/<int:pk>/', ficha.ficha_controlador, name="cont_ficha"),
+    path('fichas/', ficha.ficha_controlador, name="cont_ficha"),
+    path('fichas/<int:pk>/', ficha.ficha_controlador, name="cont_ficha"),
     # Usuario
-    path('usuario/', usuario.usuario_controlador, name="cont_usuario"),
-    path('usuario/<int:pk>/', usuario.usuario_controlador, name="cont_usuario_detail"), 
-    path('inicioSesion/', usuario.inicio_sesion, name="inicio_sesion"),
-    path('validarToken/', usuario.validarToken, name='protected_view'),
+    path('usuarios/', usuario.usuario_controlador, name="cont_usuario"),
+    path('usuarios/<int:pk>/', usuario.usuario_controlador, name="cont_usuario_detail"), 
+    path('inicio-sesion/', usuario.inicio_sesion, name="inicio_sesion"),
+    path('validar-token/', usuario.validarToken, name='protected_view'),
     # Objeto
-    path('objeto/', objeto.objeto_controlador, name="cont_objeto"),
-    path('objeto/<int:pk>/', objeto.objeto_controlador, name="cont_objeto"),
+    path('objetos/', objeto.objeto_controlador, name="cont_objeto"),
+    path('objetos/<int:pk>/', objeto.objeto_controlador, name="cont_objeto"),
     # Tutor
-    path('tutor/', tutor.tutor_controlador),
-    path('tutor/<int:pk>/', tutor.tutor_controlador),
+    path('tutores/', tutor.tutor_controlador),
+    path('tutores/<int:pk>/', tutor.tutor_controlador),
     # Ingreso
-    path('ingreso/', ingreso.ingreso_controlador, name="cont_ingreso"),
-    path('ingreso/<int:pk>/', ingreso.ingreso_controlador, name="cont_ingreso"),
+    path('ingresos/', ingreso.ingreso_controlador, name="cont_ingreso"),
+    path('ingresos/<int:pk>/', ingreso.ingreso_controlador, name="cont_ingreso"),
     # Registro Facial
-    path('inicioSesionFacial/', InicioSesionFacial.as_view()),
-    path('registroFacial/', RegistroFacial.as_view()),
+    path('inicio-sesion-facial/', InicioSesionFacial.as_view()),
+    path('registro-facial/', RegistroFacial.as_view()),
 ]
 
 
