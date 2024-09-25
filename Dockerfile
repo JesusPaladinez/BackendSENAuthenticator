@@ -4,7 +4,7 @@ FROM python:3.10-slim
 # Establecer un directorio de trabajo
 WORKDIR /Backend
 
-# Instalar las dependencias del sistema necesarias para compilar dlib y OpenCV
+# Instalar las dependencias del sistema necesarias para compilar dlib, OpenCV y psycopg2
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -12,7 +12,10 @@ RUN apt-get update && apt-get install -y \
     liblapack-dev \
     libx11-dev \
     libgl1-mesa-glx \
-    libglib2.0-0
+    libglib2.0-0 \
+    libpq-dev \
+    gcc \
+    python3-dev
 
 # Crear un entorno virtual
 RUN python -m venv /opt/venv
@@ -32,6 +35,3 @@ RUN chmod +x /start.sh
 
 # Comando para iniciar la aplicación utilizando el script de inicio
 CMD ["/start.sh"]
-
-
-
