@@ -1,6 +1,6 @@
 from django.urls import path
-from app_senauthenticator.controllers import programa, ficha, usuario, registro_facial, objeto, ingreso, tutor,recuperar_contraseña,oficina
-# from app_senauthenticator.controllers.autenticacion_facial import AutenticacionFacial
+from app_senauthenticator.controllers import programa, ficha, usuario, objeto, ingreso, tutor, oficina, usuarioExterno
+
 from app_senauthenticator.controllers.registro_facial import RegistroFacial
 from app_senauthenticator.controllers.inicio_sesion_facial import InicioSesionFacial
 from django.conf import settings
@@ -22,6 +22,9 @@ urlpatterns = [
     path('usuarios/<int:pk>/', usuario.usuario_controlador, name="cont_usuario_detail"), 
     path('inicio-sesion/', usuario.inicio_sesion, name="inicio_sesion"),
     path('validar-token/', usuario.validarToken, name='protected_view'),
+    # Usuario Externo
+    path('usuariosExternos/', usuarioExterno.usuario_controlador, name="cont_usuario_externo"),
+    path('usuariosExternos/<int:pk>/', usuarioExterno.usuario_controlador, name="cont_usuario_externo"), 
     # Objeto
     path('objetos/', objeto.objeto_controlador, name="cont_objeto"),
     path('objetos/<int:pk>/', objeto.objeto_controlador, name="cont_objeto"),
@@ -31,7 +34,7 @@ urlpatterns = [
     # Ingreso
     path('ingresos/', ingreso.ingreso_controlador, name="cont_ingreso"),
     path('ingresos/<int:pk>/', ingreso.ingreso_controlador, name="cont_ingreso"),
-    # Registro Facial
+    # Reconocimiento Facial
     path('inicio-sesion-facial/', InicioSesionFacial.as_view()),
     path('registro-facial/', RegistroFacial.as_view()),
     path('tutor/', tutor.tutor_controlador),
