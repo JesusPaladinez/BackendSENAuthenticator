@@ -18,9 +18,10 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'genero_usuario': {'required': False},
             'rol_usuario': {'required': False},
             'ficha_usuario': {'required': False},
-            'face_register': {'required': True},
+            'face_register': {'required': False},
             'first_name': {'required': True},
             'last_name': {'required': False},
             'email': {'required': True},
             'password': {'required': True},
         } 
+    
