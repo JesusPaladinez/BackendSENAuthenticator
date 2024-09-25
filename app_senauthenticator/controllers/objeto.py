@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status 
 import pyrebase
 
+
 # Configuración de Firebase
 config = {
   "apiKey": "AIzaSyAq7WwHvbgox2xJQHqK9yPYfrK3gpPt4K4",
@@ -20,6 +21,7 @@ config = {
 
 firebase_storage = pyrebase.initialize_app(config)
 storage = firebase_storage.storage()
+
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def objeto_controlador(request, pk=None):
@@ -41,7 +43,13 @@ def objeto_controlador(request, pk=None):
                 # Subir el archivo a Firebase Storage directamente
                 storage_path = f"objetos/{foto.name}"
                 storage.child(storage_path).put(file_bytes)  # Subir los bytes del archivo
-                image_url = storage.child(storage_path).get_url(None)  # Obtener la URL
+
+                # Obtener la metadata del archivo, incluyendo el token
+                image_metadata = storage.child(storage_path).get_url(None)
+
+                # Agregar el token manualmente a la URL
+                token = storage.child(storage_path).get('downloadTokens')
+                image_url = f"{image_metadata}&token={token}"
 
                 # Actualizar el campo de imagen en la solicitud
                 request.data['foto_objeto'] = image_url
@@ -71,7 +79,13 @@ def objeto_controlador(request, pk=None):
                     # Subir el archivo a Firebase Storage
                     storage_path = f"objetos/{foto.name}"
                     storage.child(storage_path).put(file_bytes)  # Subir los bytes del archivo
-                    image_url = storage.child(storage_path).get_url(None)  # Obtener la URL
+
+                    # Obtener la metadata del archivo, incluyendo el token
+                    image_metadata = storage.child(storage_path).get_url(None)
+
+                    # Obtener el token de acceso
+                    token = storage.child(storage_path).get('downloadTokens')
+                    image_url = f"{image_metadata}&token={token}"
 
                     # Agregar la URL de la imagen al request data
                     request.data['foto_objeto'] = image_url
