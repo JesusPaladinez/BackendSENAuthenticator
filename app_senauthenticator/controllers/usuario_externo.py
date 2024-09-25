@@ -1,11 +1,12 @@
 # Librerías para registrar los datos del usuario
 from rest_framework_simplejwt.tokens import RefreshToken  # Importar JWT
 from app_senauthenticator.models import UsuarioExterno
-from app_senauthenticator.serializers.usuario import UsuarioSerializer
+from app_senauthenticator.serializers.usuario_externo import UsuarioExternoSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def usuario_externo_controlador(request, pk=None):
@@ -16,12 +17,12 @@ def usuario_externo_controlador(request, pk=None):
 
             # Solicitud para obtener un objeto
             if request.method == 'GET':
-                serializer = UsuarioSerializer(usuario)  # Serializar el objeto
+                serializer = UsuarioExternoSerializer(usuario)  # Serializar el objeto
                 return Response(serializer.data)  # Devolver el objeto serializado
 
             # Solicitud para actualizar un objeto
             elif request.method == 'PUT':
-                serializer = UsuarioSerializer(usuario, data=request.data)  # Serializar los datos actualizados
+                serializer = UsuarioExternoSerializer(usuario, data=request.data)  # Serializar los datos actualizados
                 if serializer.is_valid():
                     serializer.save()  # Guardar los datos actualizados
                     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -37,12 +38,12 @@ def usuario_externo_controlador(request, pk=None):
             # Solicitud para obtener todos los objetos
             if request.method == 'GET':
                 usuarios = UsuarioExterno.objects.all()  # Obtener todos los objetos
-                serializer = UsuarioSerializer(usuarios, many=True)  # Serializar múltiples objetos
+                serializer = UsuarioExternoSerializer(usuarios, many=True)  # Serializar múltiples objetos
                 return Response(serializer.data)
 
             # Solicitud para crear un nuevo objeto
             elif request.method == 'POST':
-                usuario_serializer = UsuarioSerializer(data=request.data)
+                usuario_serializer = UsuarioExternoSerializer(data=request.data)
                 if usuario_serializer.is_valid():
                     # Guardar el usuario
                     usuario = usuario_serializer.save()

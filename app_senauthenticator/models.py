@@ -1,5 +1,5 @@
 from djongo import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 
 
 tipo_documento_usuario=[
@@ -73,6 +73,17 @@ class Usuario(AbstractUser):
     USERNAME_FIELD = 'numero_documento_usuario' # se cambia el username por el numero_documento_usuario para poder autenticarse
     REQUIRED_FIELDS = ['username', 'email'] # campos requeridos al momento de crear un super usuario
 
+    groups = models.ManyToManyField(
+        Group,
+        related_name='usuario_set',  
+        blank=True
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='usuario_permissions_set',  
+        blank=True
+    )
+
     def __str__(self) -> str:
         return self.numero_documento_usuario
 
@@ -91,12 +102,23 @@ class Oficina(models.Model):
 
 
 class UsuarioExterno(AbstractUser):
-    tipo_documento_usuario=models.CharField(max_length=50, choices=tipo_documento_usuario, default='Cedula de ciudadania', db_column='tipo_documento_usuario')
-    numero_documento_usuario=models.CharField(max_length=20, unique=True, db_column='numero_documento_usuario'),
-    oficina_usuario = models.ForeignKey(Oficina, on_delete=models.PROTECT, db_column='oficina')
+    tipo_documento_usuario_externo=models.CharField(max_length=50, choices=tipo_documento_usuario, default='Cedula de ciudadania', db_column='tipo_documento_usuario')
+    numero_documento_usuario_externo=models.CharField(max_length=20, unique=True, db_column='numero_documento_usuario')
+    oficina_usuario_externo = models.ForeignKey(Oficina, on_delete=models.PROTECT, db_column='oficina')
 
 
     REQUIRED_FIELDS = 'numero_documento_usuario' # se cambia el username por el numero_documento_usuario para poder autenticarse
+
+    groups = models.ManyToManyField(
+        Group,
+        related_name='usuarioexterno_set',  
+        blank=True
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='usuarioexterno_permissions_set', 
+        blank=True
+    )
 
     def __str__(self) -> str:
         return self.numero_documento_usuario

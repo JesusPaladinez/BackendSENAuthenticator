@@ -30,40 +30,45 @@ from django.http import JsonResponse
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def usuario_controlador(request, pk=None):
     try:
-        # Si existe la pk se manejan los métodos GET, PUT, DELETE
         if pk:
-            usuario = Usuario.objects.get(pk=pk)  # Se intenta obtener el objeto por su pk
+            usuario = Usuario.objects.get(pk=pk)
 
             # Solicitud para obtener un objeto
             if request.method == 'GET':
-                serializer = UsuarioSerializer(usuario)  # Serializar el objeto
-                return Response(serializer.data)  # Devolver el objeto serializado
+                serializer = UsuarioSerializer(usuario)
+                return Response(serializer.data)
 
             # Solicitud para actualizar un objeto
             elif request.method == 'PUT':
-                serializer = UsuarioSerializer(usuario, data=request.data)  # Serializar los datos actualizados
+                serializer = UsuarioSerializer(usuario, data=request.data)
                 if serializer.is_valid():
-                    serializer.save()  # Guardar los datos actualizados
+                    serializer.save()
                     return Response(serializer.data, status=status.HTTP_200_OK)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             # Solicitud para eliminar un objeto
             elif request.method == 'DELETE':
-                usuario.delete()  # Eliminar el objeto
+                usuario.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
 
-        # Si no existe la pk se manejan los métodos GET, POST
         else:
             # Solicitud para obtener todos los objetos
             if request.method == 'GET':
-                usuarios = Usuario.objects.all()  # Obtener todos los objetos
-                serializer = UsuarioSerializer(usuarios, many=True)  # Serializar múltiples objetos
+                usuarios = Usuario.objects.all()
+                serializer = UsuarioSerializer(usuarios, many=True)
                 return Response(serializer.data)
 
             # Solicitud para crear un nuevo objeto
             elif request.method == 'POST':
+                # Extraer el número de documento del request.data
+                numero_documento = request.data.get('numero_documento')
+
+                # Crear un nuevo usuario y asignar el username
                 usuario_serializer = UsuarioSerializer(data=request.data)
                 if usuario_serializer.is_valid():
+                    # Asigna el número de documento al username
+                    usuario_serializer.validated_data['username'] = numero_documento
+                    
                     # Guardar el usuario
                     usuario = usuario_serializer.save()
                     usuario.set_password(request.data['password'])  # Encriptar la contraseña
