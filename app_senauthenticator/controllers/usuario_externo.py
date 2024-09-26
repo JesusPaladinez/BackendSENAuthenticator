@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 
+
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def usuario_externo_controlador(request, pk=None):
     try:
