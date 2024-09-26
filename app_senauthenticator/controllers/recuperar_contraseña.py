@@ -10,7 +10,6 @@ from django.utils import timezone
 from django.urls import reverse
 
 
-
 def ForgotPassword(request):
 
     if request.method == "POST":
@@ -46,6 +45,7 @@ def ForgotPassword(request):
 
     return render(request, 'forgot_password.html')
 
+
 def PasswordResetSent(request, reset_id):
 
     if PasswordReset.objects.filter(reset_id=reset_id).exists():
@@ -54,6 +54,7 @@ def PasswordResetSent(request, reset_id):
         # redirect to forgot password page if code does not exist
         messages.error(request, 'Invalid reset id')
         return redirect('forgot-password')
+
 
 def ResetPassword(request, reset_id):
 

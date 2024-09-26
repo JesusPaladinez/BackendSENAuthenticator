@@ -1,5 +1,5 @@
 from django.urls import path
-from app_senauthenticator.controllers import programa, ficha, usuario, objeto, ingreso, tutor, oficina, usuario_externo
+from app_senauthenticator.controllers import programa, ficha, usuario, objeto, ingreso, tutor, oficina, usuario_externo, recuperar_contraseña
 from app_senauthenticator.controllers.registro_facial import RegistroFacial
 from app_senauthenticator.controllers.inicio_sesion_facial import InicioSesionFacial
 from django.conf import settings
@@ -43,9 +43,9 @@ urlpatterns = [
     path('inicioSesion/', usuario.inicio_sesion),
 
     # recuperar contraseña
-    path('forgotpassword/', usuario.ForgotPassword, name='forgot-password'),
-    path('passwordresetsent/<str:reset_id>/', usuario.PasswordResetSent, name='password-reset-sent'),
-    path('resetpassword/<str:reset_id>/', usuario.ResetPassword, name='reset-password'),
+    path('forgotpassword/', recuperar_contraseña.ForgotPassword, name='forgot-password'),
+    path('passwordresetsent/<str:reset_id>/', recuperar_contraseña.PasswordResetSent, name='password-reset-sent'),
+    path('resetpassword/<str:reset_id>/', recuperar_contraseña.ResetPassword, name='reset-password'),
     # path('autenticacionFacial/', AutenticacionFacial.as_view())
 ]
 
