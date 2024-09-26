@@ -29,9 +29,9 @@ from django.http import JsonResponse
 @api_view(['GET', 'POST'])
 def usuarios_controlador(request):
     if request.method == 'GET':
-        return obtener_usuarios(request)
+        return obtener_usuarios(request._request)
     elif request.method == 'POST':
-        return crear_usuario(request)
+        return crear_usuario(request._request)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
