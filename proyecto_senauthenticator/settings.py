@@ -92,8 +92,12 @@ DATABASES = {
         default=os.getenv('DATABASE_URL')
     )
 }
+
+
+
+# DATABASES['default']=dj_database_url.parse("postgresql://postgres:fOpxDpFkMmJlCrlASPofRhEiBkKiAqmU@postgres.railway.internal:5432/railway")
     
-# DATABASES ["default"] = dj_database_url.parse('postgresql://senauthenticator_db_9c5c_user:aGE65xoUeYsYciQ8Qrw9nfAN08Ybhyip@dpg-crovmqdds78s73d2h69g-a.oregon-postgres.render.com/senauthenticator_db_9c5c')
+
 
 
 # Password validation
@@ -189,3 +193,10 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:5173/',  # URL del frontend
 ]
+
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER ='moto.emacasta12@gmail.com'
+EMAIL_HOST_PASSWORD ='aytyfmpcczisphrd'
