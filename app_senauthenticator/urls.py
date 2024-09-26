@@ -17,8 +17,8 @@ urlpatterns = [
     path('fichas/', ficha.ficha_controlador, name="cont_ficha"),
     path('fichas/<int:pk>/', ficha.ficha_controlador, name="cont_ficha"),
     # Usuario
-    path('usuarios/', usuario.usuario_controlador, name="cont_usuario"),
-    path('usuarios/<int:pk>/', usuario.usuario_controlador, name="cont_usuario_detail"), 
+    path('usuarios/', usuario.usuarios_controlador, name="cont_usuario"),
+    path('usuarios/<int:pk>/', usuario.usuario_detalle_controlador, name="cont_usuario_detail"), 
     path('inicio-sesion/', usuario.inicio_sesion, name="inicio_sesion"),
     path('validar-token/', usuario.validarToken, name='protected_view'),
     # Usuario Externo
@@ -36,6 +36,17 @@ urlpatterns = [
     # Reconocimiento Facial
     path('inicio-sesion-facial/', InicioSesionFacial.as_view()),
     path('registro-facial/', RegistroFacial.as_view()),
+    path('tutor/', tutor.tutor_controlador),
+    path('tutor/<int:pk>/', tutor.tutor_controlador),
+    path('ingreso/', ingreso.ingreso_controlador),
+    path('ingreso/<int:pk>/', ingreso.ingreso_controlador),
+    path('inicioSesion/', usuario.inicio_sesion),
+
+    # recuperar contraseña
+    path('forgotpassword/', usuario.ForgotPassword, name='forgot-password'),
+    path('passwordresetsent/<str:reset_id>/', usuario.PasswordResetSent, name='password-reset-sent'),
+    path('resetpassword/<str:reset_id>/', usuario.ResetPassword, name='reset-password'),
+    # path('autenticacionFacial/', AutenticacionFacial.as_view())
 ]
 
 
