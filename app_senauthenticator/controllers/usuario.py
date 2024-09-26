@@ -1,6 +1,6 @@
 # Librerías para registrar los datos del usuario
 from rest_framework_simplejwt.tokens import RefreshToken  # Importar JWT
-from app_senauthenticator.models import Usuario,PasswordReset
+from app_senauthenticator.models import Usuario
 from app_senauthenticator.serializers.usuario import UsuarioSerializer
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,9 +17,9 @@ import numpy as np
 @api_view(['GET', 'POST'])
 def usuarios_controlador(request):
     if request.method == 'GET':
-        return obtener_usuarios(request._request)
+        return obtener_usuarios(request)
     elif request.method == 'POST':
-        return crear_usuario(request._request)
+        return crear_usuario(request)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
