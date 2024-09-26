@@ -15,6 +15,7 @@ import os
 import dj_database_url
 from decouple import config
 from datetime import timedelta
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -162,16 +163,40 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Permite todas las solicitudes de todos los dominios(esto puede ser inseguro para producción)
 CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'authorization',
+    'content-type',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # autoriza rutas para poderse ejecutar (en este caso la de Next.js y la de Flutter)
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # URL del frontend en desarrollo
     'http://localhost:5173',
-    
+    'http://localhost:61312',
     'https://backendsenauthenticator.onrender.com',  # URL de producción
     'https://backprojecto.onrender.com',
     'https://senauthenticator.onrender.com',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:5173/',  # URL del frontend
 ]
 
 # Configuración de esquema para que django rest framework y coreapi puedan documentar el código
@@ -196,12 +221,6 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_SAMESITE': 'None', # para usar AUTH_COOKIE_SAMESITE:'none', AUTH_COOKIE_SECURE debe estar en True en producción
    
 }
-
-
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:5173/',  # URL del frontend
-]
 
 
 EMAIL_HOST = 'smtp.gmail.com'

@@ -17,8 +17,8 @@ urlpatterns = [
     path('fichas/', ficha.ficha_controlador, name="cont_ficha"),
     path('fichas/<int:pk>/', ficha.ficha_controlador, name="cont_ficha"),
     # Usuario
-    path('usuarios/', usuario.usuario_controlador, name="cont_usuario"),
-    path('usuarios/<int:pk>/', usuario.usuario_controlador, name="cont_usuario_detail"), 
+    path('usuarios/', usuario.usuarios_controlador, name="cont_usuario"),
+    path('usuarios/<int:pk>/', usuario.usuario_detalle_controlador, name="cont_usuario_detail"), 
     path('inicio-sesion/', usuario.inicio_sesion, name="inicio_sesion"),
     path('validar-token/', usuario.validarToken, name='protected_view'),
     # Usuario Externo

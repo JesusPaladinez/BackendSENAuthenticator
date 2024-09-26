@@ -26,80 +26,76 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 
 
+@api_view(['GET', 'POST'])
+def usuarios_controlador(request):
+    if request.method == 'GET':
+        return obtener_usuarios(request)
+    elif request.method == 'POST':
+        return crear_usuario(request)
 
-@api_view(['GET', 'POST', 'PUT', 'DELETE'])
-def usuario_controlador(request, pk=None):
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def usuario_detalle_controlador(request, pk):
+    if request.method == 'GET':
+        return obtener_usuario(request, pk)
+    elif request.method == 'PUT':
+        return actualizar_usuario(request, pk)
+    elif request.method == 'DELETE':
+        return eliminar_usuario(request, pk)
+
+
+@api_view(['GET'])
+def obtener_usuarios(request):
     try:
-        if pk:
-            usuario = Usuario.objects.get(pk=pk)
-
-            # Solicitud para obtener un objeto
-            if request.method == 'GET':
-                serializer = UsuarioSerializer(usuario)
-                return Response(serializer.data)
-
-            # Solicitud para actualizar un objeto
-            elif request.method == 'PUT':
-                serializer = UsuarioSerializer(usuario, data=request.data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-            # Solicitud para eliminar un objeto
-            elif request.method == 'DELETE':
-                usuario.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-
-        else:
-            # Solicitud para obtener todos los objetos
-            if request.method == 'GET':
-                usuarios = Usuario.objects.all()
-                serializer = UsuarioSerializer(usuarios, many=True)
-                return Response(serializer.data)
-
-            # Solicitud para crear un nuevo objeto
-            elif request.method == 'POST':
-                # Extraer el número de documento del request.data
-                numero_documento = request.data.get('numero_documento_usuario')
-
-                # Asignar el número de documento al campo username en el request.data
-                request.data['username'] = numero_documento
-
-                # Crear un nuevo usuario con los datos actualizados
-                usuario_serializer = UsuarioSerializer(data=request.data)
-                
-                if usuario_serializer.is_valid():
-                    # Guardar el usuario
-                    usuario = usuario_serializer.save()
-                    usuario.set_password(request.data['password'])  # Encriptar la contraseña
-                    usuario.save()
-
-                    # Generar los tokens JWT
-                    refresh = RefreshToken.for_user(usuario)
-                    access_token = str(refresh.access_token)
-
-                    # Crear la respuesta con los tokens en cookies
-                    response = Response({'usuario': usuario_serializer.data}, status=status.HTTP_201_CREATED)
-                    response.set_cookie(
-                        key='jwt-access',
-                        value=access_token,
-                        httponly=True,
-                        secure=True,
-                        samesite='None'
-                    )
-
-                    # Procesar el registro facial si se proporciona una imagen
-                    if 'face_register' in request.data:
-                        return registrar_rostro(request.data['face_register'], usuario_serializer)
-
-                    return response
-                return Response(usuario_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    except Usuario.DoesNotExist:
-        return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+        usuarios = Usuario.objects.all()
+        serializer = UsuarioSerializer(usuarios, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({'error': f'Error en el controlador de usuario: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': f'Error al obtener los usuarios: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def crear_usuario(request):
+    try:
+        numero_documento = request.data.get('numero_documento_usuario')
+        if not numero_documento:
+            return Response({'error': 'El número de documento es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Asignar el número de documento al campo username
+        request.data['username'] = numero_documento
+
+        # Crear un nuevo usuario con los datos actualizados
+        usuario_serializer = UsuarioSerializer(data=request.data)
+        if usuario_serializer.is_valid():
+            usuario = usuario_serializer.save()
+            usuario.set_password(request.data['password'])  # Encriptar la contraseña
+            usuario.save()
+
+            # Generar tokens JWT
+            refresh = RefreshToken.for_user(usuario)
+            access_token = str(refresh.access_token)
+
+            # Crear la respuesta con los tokens en cookies
+            response = Response({'usuario': usuario_serializer.data}, status=status.HTTP_201_CREATED)
+            response.set_cookie(
+                key='jwt-access',
+                value=access_token,
+                httponly=True,
+                secure=True,
+                samesite='None'
+            )
+
+            # Procesar el registro facial si se proporciona una imagen
+            if 'face_register' in request.data:
+                return registrar_rostro(request.data['face_register'], usuario_serializer)
+
+            return response
+        else:
+            return Response(usuario_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except KeyError as e:
+        return Response({'error': f'Campo faltante: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': f'Error al crear el usuario: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 def registrar_rostro(face_register, usuario_serializer):
@@ -135,6 +131,39 @@ def registrar_rostro(face_register, usuario_serializer):
 
     except Exception as e:
         return Response({"error": f"Error al registrar el rostro: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def obtener_usuario(request, pk):
+    try:
+        usuario = Usuario.objects.get(pk=pk)
+        serializer = UsuarioSerializer(usuario)
+        return Response(serializer.data)
+    except Usuario.DoesNotExist:
+        return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PUT'])
+def actualizar_usuario(request, pk):
+    try:
+        usuario = Usuario.objects.get(pk=pk)
+        serializer = UsuarioSerializer(usuario, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Usuario.DoesNotExist:
+        return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['DELETE'])
+def eliminar_usuario(request, pk):
+    try:
+        usuario = Usuario.objects.get(pk=pk)
+        usuario.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except Usuario.DoesNotExist:
+        return Response({'error': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])
@@ -174,8 +203,6 @@ def inicio_sesion(request):
 @permission_classes([IsAuthenticated])  # Extrae y verifica el token enviado en la cabecera Authorization es válido.
 def validarToken(request):
     return Response({'message': 'Usuario autenticado correctamente'}, status=200)
-
-    
 
 
 @csrf_exempt
