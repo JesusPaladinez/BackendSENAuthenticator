@@ -12,10 +12,20 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import json
 import dj_database_url
 from decouple import config
 from datetime import timedelta
 from decouple import config
+from firebase_admin import credentials
+
+firebase_credential = os.getenv('FIREBASE_CREDENTIALS')
+
+if firebase_credential:
+    cred_dict = json.loads(firebase_credential)
+    cred = credentials.Certificate(cred_dict)
+else:
+    raise Exception("Firebase credentials not found")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +41,7 @@ SECRET_KEY = 'django-insecure-*dhg)w2)u_k6d)(5n)ihfqen*wp#jy6f=e8%2(z!=nipbwrr)^
 DEBUG = True
 
 # Permite alojar el proyecto en todos los dominios
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['backendsenauthenticator.up.railway.app', 'localhost', '127.0.0.1']
 
 
 # Application definition
