@@ -12,20 +12,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
-import json
 import dj_database_url
 from decouple import config
 from datetime import timedelta
 from decouple import config
-from firebase_admin import credentials
 
-firebase_credential = os.getenv('FIREBASE_CREDENTIALS')
-
-if firebase_credential:
-    cred_dict = json.loads(firebase_credential)
-    cred = credentials.Certificate(cred_dict)
-else:
-    raise Exception("Firebase credentials not found")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

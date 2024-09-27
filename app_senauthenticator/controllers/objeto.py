@@ -1,3 +1,5 @@
+import os
+import json
 import firebase_admin
 from firebase_admin import credentials, storage as admin_storage
 from app_senauthenticator.models import Objeto
@@ -8,28 +10,33 @@ from rest_framework import status
 import pyrebase
 
 
-# Configuración de Firebase
+# Cargar credenciales de Firebase desde variable de entorno
+firebase_credential = os.getenv('FIREBASE_CREDENTIAL')
+
+if firebase_credential:
+    cred_dict = json.loads(firebase_credential)
+    cred = credentials.Certificate(cred_dict)
+    firebase_admin.initialize_app(cred, {
+        'storageBucket': 'projectstoragesenauthenticator.appspot.com'
+    })
+else:
+    raise Exception("Firebase credentials not found")
+
+
+# Configuración de Firebase con pyrebase
 config = {
-    "apiKey": "AIzaSyAq7WwHvbgox2xJQHqK9yPYfrK3gpPt4K4",
+    "apiKey": os.getenv('FIREBASE_API_KEY'),
     "authDomain": "projectstoragesenauthenticator.firebaseapp.com",
     "projectId": "projectstoragesenauthenticator",
     "storageBucket": "projectstoragesenauthenticator.appspot.com",
     "messagingSenderId": "371522976959",
     "appId": "1:371522976959:web:f99bc5b20a440aaac5da0a",
     "measurementId": "G-5TEEM4Y3P3",
-    "service_account": "clave_cuenta_servicio.json",
     "databaseURL": "https://projectstoragesenauthenticator-default-rtdb.firebaseio.com/"
 }
 
 firebase_storage = pyrebase.initialize_app(config)
 storage = firebase_storage.storage()
-
-
-# Inicializar Firebase Admin SDK
-cred = credentials.Certificate('clave_cuenta_servicio.json')
-firebase_admin.initialize_app(cred, {
-    'storageBucket': 'projectstoragesenauthenticator.appspot.com'
-})
 
 
 @api_view(['GET', 'POST'])
