@@ -1,10 +1,11 @@
+import firebase_admin
+from firebase_admin import credentials, storage as admin_storage
 from app_senauthenticator.models import Objeto
 from app_senauthenticator.serializers.objeto import ObjetoSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 import pyrebase
-import json
 
 
 # Configuración de Firebase
@@ -22,6 +23,13 @@ config = {
 
 firebase_storage = pyrebase.initialize_app(config)
 storage = firebase_storage.storage()
+
+
+# Inicializar Firebase Admin SDK
+cred = credentials.Certificate('clave_cuenta_servicio.json')
+firebase_admin.initialize_app(cred, {
+    'storageBucket': 'projectstoragesenauthenticator.appspot.com'
+})
 
 
 @api_view(['GET', 'POST'])
@@ -59,21 +67,27 @@ def crear_objeto(request):
             foto = request.FILES['foto_objeto']
             file_bytes = foto.read()
 
-            # Subir el archivo a Firebase Storage
+            # Subir el archivo a Firebase Storage usando pyrebase
             storage_path = f"objetos/{foto.name}"
             storage.child(storage_path).put(file_bytes)
 
-            # Obtener la URL pública del archivo subido (sin token)
+            # Obtener la URL pública del archivo subido
             image_metadata = storage.child(storage_path).get_url(None)
 
-            # Obtener la metadata del archivo almacenado
-            metadata = storage.child(storage_path).get_metadata()
+            # Obtener el bucket de Firebase Storage con Admin SDK
+            bucket = admin_storage.bucket()
 
-            # El token de descarga se encuentra en 'downloadTokens' en los metadatos
-            token = json.loads(metadata['downloadTokens'])[0]  # Obtener el token de la metadata
-            image_url = f"{image_metadata}&token={token}"  # Construir la URL con el token
+            # Obtener el blob (archivo) y los metadatos
+            blob = bucket.blob(storage_path)
+            blob.reload()  # Cargar los metadatos actuales
 
-            # Asignar la URL de la imagen al campo 'foto_objeto' en el request
+            # El token de descarga está en 'metadata.downloadTokens'
+            token = blob.metadata.get('firebaseStorageDownloadTokens')
+
+            # Construir la URL completa con el token
+            image_url = f"{image_metadata}&token={token}"
+
+            # Asignar la URL de la imagen al campo 'foto_objeto'
             request.data['foto_objeto'] = image_url
 
         # Serializar y guardar los datos
