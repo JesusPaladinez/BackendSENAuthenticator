@@ -23,7 +23,7 @@ def usuarios_controlador(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-def usuario_detalle_controlador(request, pk):
+def usuarios_detalle_controlador(request, pk):
     if request.method == 'GET':
         return obtener_usuario(request._request, pk)
     elif request.method == 'PUT':

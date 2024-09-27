@@ -18,15 +18,15 @@ urlpatterns = [
     path('fichas/<int:pk>/', ficha.ficha_controlador, name="cont_ficha"),
     # Usuario
     path('usuarios/', usuario.usuarios_controlador, name="cont_usuario"),
-    path('usuarios/<int:pk>/', usuario.usuario_detalle_controlador, name="cont_usuario_detail"), 
+    path('usuarios/<int:pk>/', usuario.usuarios_detalle_controlador, name="cont_usuario_detail"), 
     path('inicio-sesion/', usuario.inicio_sesion, name="inicio_sesion"),
     path('validar-token/', usuario.validarToken, name='protected_view'),
     # Usuario Externo
     path('usuarios-externos/', usuario_externo.usuario_externo_controlador, name="cont_usuario_externo"),
     path('usuarios-externos/<int:pk>/', usuario_externo.usuario_externo_controlador, name="cont_usuario_externo"), 
     # Objeto
-    path('objetos/', objeto.objeto_controlador, name="cont_objeto"),
-    path('objetos/<int:pk>/', objeto.objeto_controlador, name="cont_objeto"),
+    path('objetos/', objeto.objetos_controlador, name="cont_objeto"),
+    path('objetos/<int:pk>/', objeto.objetos_detalle_controlador, name="cont_objeto"),
     # Tutor
     path('tutores/', tutor.tutor_controlador),
     path('tutores/<int:pk>/', tutor.tutor_controlador),
