@@ -16,7 +16,14 @@ import dj_database_url
 from decouple import config
 from datetime import timedelta
 from decouple import config
+import environ
 
+# Inicializa el entorno
+env = environ.Env()
+environ.Env.read_env()  # Lee el archivo .env si existe
+
+# Obtén las credenciales de Firebase
+FIREBASE_CREDENTIALS = env('FIREBASE_CREDENTIALS')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
