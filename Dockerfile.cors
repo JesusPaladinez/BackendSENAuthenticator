@@ -1,0 +1,11 @@
+# Usar una imagen base oficial de Node.js
+FROM node:14-slim
+
+# Instalar firebase-tools
+RUN npm install -g firebase-tools
+
+# Copiar el archivo de configuración de CORS
+COPY cors.json /cors.json
+
+# Aplicar la configuración de CORS
+CMD ["sh", "-c", "firebase login:ci --token $FIREBASE_TOKEN && firebase storage:bucket:set-cors /cors.json"]
