@@ -23,24 +23,20 @@ def initialize_firebase():
         cred_dict = json.loads(firebase_credential)
         cred = credentials.Certificate(cred_dict)
 
-        # Inicializar Firebase con las credenciales
-        firebase_admin.initialize_app(cred)
-        print("Firebase initialized successfully")
-
-    except json.JSONDecodeError as e:
-        # Capturar error en el formato del JSON
-        raise Exception(f"Error decoding Firebase credentials JSON: {str(e)}")
-
-    except FileNotFoundError as e:
-        # Capturar si el archivo de credenciales no se encuentra (en caso de usar un archivo)
-        raise Exception(f"Firebase credentials file not found: {str(e)}")
+        # Inicializar la aplicación de Firebase
+        try:
+            firebase_admin.initialize_app(cred, {
+                'storageBucket': 'projectstoragesenauthenticator.appspot.com'
+            })
+        except ValueError as e:
+            if 'The default Firebase app already exists' in str(e):
+                pass  # La aplicación ya esta inicializada, continuar
+            else:
+                raise e
 
     except Exception as e:
-        # Capturar cualquier otro error que ocurra durante la inicialización
-        raise Exception(f"Error initializing Firebase: {str(e)}")
-
-# Llamar la función para inicializar Firebase
-initialize_firebase()
+        # Manejar cualquier otra excepción
+        raise e
 
 
 # Configuración de Firebase con pyrebase
