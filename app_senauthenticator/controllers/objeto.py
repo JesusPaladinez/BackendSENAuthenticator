@@ -23,14 +23,14 @@ def initialize_firebase():
         cred_dict = json.loads(firebase_credential)
         cred = credentials.Certificate(cred_dict)
 
-        # Inicializar la aplicación de Firebase
+        # Inicializar la aplicación de Firebase con el bucket de almacenamiento
         try:
             firebase_admin.initialize_app(cred, {
                 'storageBucket': 'projectstoragesenauthenticator.appspot.com'
             })
         except ValueError as e:
             if 'The default Firebase app already exists' in str(e):
-                pass  # La aplicación ya esta inicializada, continuar
+                pass  # La aplicación ya está inicializada, continuar
             else:
                 raise e
 
@@ -38,13 +38,15 @@ def initialize_firebase():
         # Manejar cualquier otra excepción
         raise e
 
+initialize_firebase()
+
 
 # Configuración de Firebase con pyrebase
 config = {
     "apiKey": os.getenv('FIREBASE_API_KEY'),
     "authDomain": "projectstoragesenauthenticator.firebaseapp.com",
     "projectId": "projectstoragesenauthenticator",
-    "storageBucket": "projectstoragesenauthenticator.appspot.com",
+    "storageBucket": "projectstoragesenauthenticator.appspot.com",  # Nombre del bucket correcto
     "messagingSenderId": "371522976959",
     "appId": "1:371522976959:web:f99bc5b20a440aaac5da0a",
     "measurementId": "G-5TEEM4Y3P3",
@@ -104,8 +106,10 @@ def crear_objeto(request):
             blob = bucket.blob(storage_path)
             blob.reload()  # Cargar los metadatos actuales
 
-            # El token de descarga está en 'metadata.downloadTokens'
+            # Verificar si existe el token de descarga en los metadatos
             token = blob.metadata.get('firebaseStorageDownloadTokens')
+            if not token:
+                raise Exception("Download token not found in blob metadata")
 
             # Construir la URL completa con el token
             image_url = f"{image_metadata}&token={token}"
@@ -151,9 +155,15 @@ def actualizar_objeto(request, pk):
 
             # Obtener la metadata del archivo, incluyendo el token
             image_metadata = storage.child(storage_path).get_url(None)
-            token = storage.child(storage_path).get('downloadTokens')
-            image_url = f"{image_metadata}&token={token}"
+            bucket = admin_storage.bucket()
+            blob = bucket.blob(storage_path)
+            blob.reload()  # Cargar los metadatos actuales
 
+            token = blob.metadata.get('firebaseStorageDownloadTokens')
+            if not token:
+                raise Exception("Download token not found in blob metadata")
+
+            image_url = f"{image_metadata}&token={token}"
             request.data['foto_objeto'] = image_url
 
         serializer = ObjetoSerializer(objeto, data=request.data)
