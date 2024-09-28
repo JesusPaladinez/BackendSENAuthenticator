@@ -15,7 +15,15 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     libpq-dev \
     gcc \
-    python3-dev
+    python3-dev \
+    curl
+
+# Instalar Node.js y npm
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+    apt-get install -y nodejs
+
+# Instalar firebase-tools
+RUN npm install -g firebase-tools
 
 # Crear un entorno virtual
 RUN python -m venv /opt/venv
@@ -35,6 +43,13 @@ RUN . /opt/venv/bin/activate && python /Backend/manage.py collectstatic --noinpu
 # Copiar el script de inicio y darle permisos de ejecución
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
+
+# Copiar el archivo de configuración de CORS
+COPY cors.json /cors.json
+
+# Aplicar la configuración de CORS
+RUN firebase login:ci --token "$FIREBASE_TOKEN" && \
+    firebase storage:bucket:set-cors /cors.json
 
 # Comando para iniciar la aplicación utilizando el script de inicio
 CMD ["/start.sh"]

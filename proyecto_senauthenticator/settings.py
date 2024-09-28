@@ -10,19 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-
 from pathlib import Path
 import os
 import dj_database_url
 from decouple import config
 from datetime import timedelta
-from decouple import config
 import environ
-import os
 import json
 import firebase_admin
 from firebase_admin import credentials
-
 
 # Carga las credenciales desde la variable de entorno
 firebase_credential = os.getenv('FIREBASE_CREDENTIALS')
@@ -39,7 +35,6 @@ firebase_admin.initialize_app(cred, {
     'storageBucket': 'projectstoragesenauthenticator.appspot.com'
 })
 
-
 # Inicializa el entorno
 env = environ.Env()
 environ.Env.read_env()  # Lee el archivo .env si existe
@@ -50,11 +45,10 @@ FIREBASE_CREDENTIALS = env('FIREBASE_CREDENTIALS')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING: keep the secret key used in secret!
 SECRET_KEY = 'django-insecure-*dhg)w2)u_k6d)(5n)ihfqen*wp#jy6f=e8%2(z!=nipbwrr)^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -62,7 +56,6 @@ DEBUG = True
 
 # Permite alojar el proyecto en todos los dominios
 ALLOWED_HOSTS = ['backendsenauthenticator.up.railway.app', 'localhost', '127.0.0.1']
-
 
 # Application definition
 
@@ -115,15 +108,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'proyecto_senauthenticator.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default=os.getenv('DATABASE_URL')
-#     )
-# }
 
 DATABASES = {
     'default': {
@@ -132,13 +118,7 @@ DATABASES = {
     },
 }
 
-DATABASES['default']=dj_database_url.parse(config("DATABASE_URL"))
-
-
-# DATABASES['default']=dj_database_url.parse("postgresql://postgres:fOpxDpFkMmJlCrlASPofRhEiBkKiAqmU@postgres.railway.internal:5432/railway")
-    
-
-
+DATABASES['default'] = dj_database_url.parse(config("DATABASE_URL"))
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -158,7 +138,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -169,7 +148,6 @@ TIME_ZONE = 'America/Bogota'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -183,7 +161,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -213,7 +190,6 @@ CORS_ALLOW_HEADERS = [
 ]
 
 # autoriza rutas para poderse ejecutar (en este caso la de Next.js y la de Flutter)
-
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # URL del frontend en desarrollo
     'http://localhost:5173',
@@ -249,12 +225,10 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_SECURE': True,  # Cambiar a True en producción para HTTPS
     'AUTH_COOKIE_HTTP_ONLY': True, # Cuando httponly está configurado como true, significa que la cookie solo puede ser accedida por el navegador y no por scripts del lado del cliente (como JavaScript).
     'AUTH_COOKIE_SAMESITE': 'None', # para usar AUTH_COOKIE_SAMESITE:'none', AUTH_COOKIE_SECURE debe estar en True en producción
-   
 }
-
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER ='moto.emacasta12@gmail.com'
-EMAIL_HOST_PASSWORD ='aytyfmpcczisphrd'
+EMAIL_HOST_USER = 'moto.emacasta12@gmail.com'
+EMAIL_HOST_PASSWORD = 'aytyfmpcczisphrd'
