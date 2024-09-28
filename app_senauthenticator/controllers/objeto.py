@@ -116,6 +116,12 @@ def crear_objeto(request):
 
             # Asignar la URL de la imagen al campo 'foto_objeto'
             request.data['foto_objeto'] = image_url
+            
+        # Verificar que cada campo esté presente en los datos del request
+        campos_requeridos = ['marca_objeto', 'modelo_objeto', 'descripcion_objeto', 'foto_objeto', 'usuario_objeto']
+        for campo in campos_requeridos:
+            if campo not in request.data:
+                return Response({'error': f'El campo {campo} es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Serializar y guardar los datos
         serializer = ObjetoSerializer(data=request.data)
