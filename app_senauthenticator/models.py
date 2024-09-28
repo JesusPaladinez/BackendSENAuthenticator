@@ -104,7 +104,9 @@ class Oficina(models.Model):
 class UsuarioExterno(AbstractUser):
     tipo_documento_usuario_externo=models.CharField(max_length=50, choices=tipo_documento_usuario, default='Cedula de ciudadania', db_column='tipo_documento_usuario')
     numero_documento_usuario_externo=models.CharField(max_length=20, unique=True, db_column='numero_documento_usuario')
+    descripcion_usuario_externo=models.TextField(db_column='descripcion_usuario_externo')
     oficina_usuario_externo = models.ForeignKey(Oficina, on_delete=models.PROTECT, db_column='oficina')
+    
 
 
     REQUIRED_FIELDS = 'numero_documento_usuario' # se cambia el username por el numero_documento_usuario para poder autenticarse
