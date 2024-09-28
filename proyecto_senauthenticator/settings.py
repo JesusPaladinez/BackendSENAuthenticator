@@ -19,6 +19,10 @@ import environ
 import json
 import firebase_admin
 from firebase_admin import credentials
+from dotenv import load_dotenv
+
+# Cargar las variables de entorno desde el archivo .env
+load_dotenv()
 
 # Carga las credenciales desde la variable de entorno
 firebase_credential = os.getenv('FIREBASE_CREDENTIALS')
@@ -26,21 +30,21 @@ firebase_credential = os.getenv('FIREBASE_CREDENTIALS')
 if not firebase_credential:
     raise Exception("Firebase credentials not found")
 
-# Convierte la cadena JSON a un diccionario
-cred_dict = json.loads(firebase_credential)
-cred = credentials.Certificate(cred_dict)
+# Depuración: imprime el contenido de firebase_credential
+print("Contenido de firebase_credential:", firebase_credential)
 
-# Inicializa Firebase
-firebase_admin.initialize_app(cred, {
-    'storageBucket': 'projectstoragesenauthenticator.appspot.com'
-})
+try:
+    # Convierte la cadena JSON a un diccionario
+    cred_dict = json.loads(firebase_credential)
+    cred = credentials.Certificate(cred_dict)
 
-# Inicializa el entorno
-env = environ.Env()
-environ.Env.read_env()  # Lee el archivo .env si existe
+    # Inicializa Firebase
+    firebase_admin.initialize_app(cred, {
+        'storageBucket': 'projectstoragesenauthenticator.appspot.com'
+    })
+except json.JSONDecodeError as e:
+    print("Error al cargar JSON:", e)
 
-# Obtén las credenciales de Firebase
-FIREBASE_CREDENTIALS = env('FIREBASE_CREDENTIALS')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -167,7 +171,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Permite todas las solicitudes de todos los dominios(esto puede ser inseguro para producción)
+# Permite todas las solicitudes de todos los dominios (esto puede ser inseguro para producción, pero es necesario para las cookies que soliciten en frontend)
 CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_METHODS = [
@@ -191,6 +195,7 @@ CORS_ALLOW_HEADERS = [
 
 # autoriza rutas para poderse ejecutar (en este caso la de Next.js y la de Flutter)
 CORS_ALLOWED_ORIGINS = [
+    'http://localhost:57467',  # URL de la móvil
     'http://localhost:3000',  # URL del frontend en desarrollo
     'http://localhost:5173',
     'http://localhost:61312',
@@ -199,11 +204,10 @@ CORS_ALLOWED_ORIGINS = [
     'https://senauthenticator.onrender.com',
 ]
 
-CORS_ALLOW_CREDENTIALS = True
+# Configurar el tiempo máximo para caché de pre-vuelo (en segundos)
+CORS_PREFLIGHT_MAX_AGE = 3600  # esto es equivalente a "maxAgeSeconds"
 
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:5173/',  # URL del frontend
-]
+CORS_ALLOW_CREDENTIALS = True
 
 # Configuración de esquema para que django rest framework y coreapi puedan documentar el código
 REST_FRAMEWORK = {

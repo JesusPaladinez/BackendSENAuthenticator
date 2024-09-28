@@ -29,8 +29,8 @@ COPY . /Backend/.
 # Instalar las dependencias de Python desde el archivo requirements.txt
 RUN . /opt/venv/bin/activate && pip install -r /Backend/requirements.txt
 
-# Recopilar archivos estáticos
-RUN . /opt/venv/bin/activate && python /Backend/manage.py collectstatic --noinput
+# Recopilar archivos estáticos, por el momento no se puede ya que no reconoce las credenciales de Firebase
+# RUN . /opt/venv/bin/activate && python /Backend/manage.py collectstatic --noinput
 
 # Copiar el script de inicio y darle permisos de ejecución
 COPY start.sh /start.sh

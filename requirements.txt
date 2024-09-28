@@ -104,6 +104,7 @@ pyserial==3.5
 PySocks==1.7.1
 python-dateutil==2.9.0.post0
 python-decouple==3.8
+python-dotenv==1.0.1
 python-jwt==4.1.0
 pytz==2024.1
 requests==2.32.2
