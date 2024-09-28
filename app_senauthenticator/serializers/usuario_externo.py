@@ -11,6 +11,7 @@ class UsuarioExternoSerializer(serializers.ModelSerializer):
             'numero_documento_usuario_externo': {'required': True},
             'first_name': {'required': True},
             'oficina_usuario_externo': {'required': True},
+            'descripcion_usuario_externo':{'required':False},
             'password': {'required': False, 'write_only': True},  # El campo password es opcional
             'username': {'required': False}  # El campo username también es opcional
         }
