@@ -46,7 +46,7 @@ config = {
     "apiKey": os.getenv('FIREBASE_API_KEY'),
     "authDomain": "projectstoragesenauthenticator.firebaseapp.com",
     "projectId": "projectstoragesenauthenticator",
-    "storageBucket": "projectstoragesenauthenticator.appspot.com",  # Nombre del bucket correcto
+    "storageBucket": "projectstoragesenauthenticator.appspot.com", 
     "messagingSenderId": "371522976959",
     "appId": "1:371522976959:web:f99bc5b20a440aaac5da0a",
     "measurementId": "G-5TEEM4Y3P3",
