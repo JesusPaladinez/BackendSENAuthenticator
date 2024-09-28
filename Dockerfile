@@ -1,4 +1,4 @@
-# Usar una imagen base oficial de Python
+# Usar una imagen base oficial de Python con Node.js preinstalado
 FROM python:3.10-slim
 
 # Establecer un directorio de trabajo
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
     curl
 
 # Instalar Node.js y npm
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get install -y nodejs
 
 # Instalar firebase-tools
@@ -40,16 +40,16 @@ RUN . /opt/venv/bin/activate && pip install -r /Backend/requirements.txt
 # Recopilar archivos estáticos
 RUN . /opt/venv/bin/activate && python /Backend/manage.py collectstatic --noinput
 
-# Copiar el script de inicio y darle permisos de ejecución
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
-
 # Copiar el archivo de configuración de CORS
 COPY cors.json /cors.json
 
 # Aplicar la configuración de CORS
 RUN firebase login:ci --token "$FIREBASE_TOKEN" && \
     firebase storage:bucket:set-cors /cors.json
+
+# Copiar el script de inicio y darle permisos de ejecución
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 # Comando para iniciar la aplicación utilizando el script de inicio
 CMD ["/start.sh"]
