@@ -191,3 +191,5 @@ def inicio_sesion(request):
 @permission_classes([IsAuthenticated])  # Extrae y verifica el token enviado en la cabecera Authorization es válido.
 def validarToken(request):
     return Response({'message': 'Usuario autenticado correctamente'}, status=200)
+
+
