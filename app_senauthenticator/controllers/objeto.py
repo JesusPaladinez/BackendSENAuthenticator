@@ -10,17 +10,37 @@ from rest_framework import status
 import pyrebase
 
 
-# Cargar credenciales de Firebase desde variable de entorno
-firebase_credential = os.getenv('FIREBASE_CREDENTIAL')
+def initialize_firebase():
+    try:
+        # Obtener las credenciales desde la variable de entorno
+        firebase_credential = os.getenv('FIREBASE_CREDENTIALS')
 
-if firebase_credential:
-    cred_dict = json.loads(firebase_credential)
-    cred = credentials.Certificate(cred_dict)
-    firebase_admin.initialize_app(cred, {
-        'storageBucket': 'projectstoragesenauthenticator.appspot.com'
-    })
-else:
-    raise Exception("Firebase credentials not found")
+        # Verificar si las credenciales están presentes
+        if not firebase_credential:
+            raise Exception("Firebase credentials not found in environment variables")
+
+        # Convertir la cadena JSON de credenciales en un diccionario
+        cred_dict = json.loads(firebase_credential)
+        cred = credentials.Certificate(cred_dict)
+
+        # Inicializar Firebase con las credenciales
+        firebase_admin.initialize_app(cred)
+        print("Firebase initialized successfully")
+
+    except json.JSONDecodeError as e:
+        # Capturar error en el formato del JSON
+        raise Exception(f"Error decoding Firebase credentials JSON: {str(e)}")
+
+    except FileNotFoundError as e:
+        # Capturar si el archivo de credenciales no se encuentra (en caso de usar un archivo)
+        raise Exception(f"Firebase credentials file not found: {str(e)}")
+
+    except Exception as e:
+        # Capturar cualquier otro error que ocurra durante la inicialización
+        raise Exception(f"Error initializing Firebase: {str(e)}")
+
+# Llamar la función para inicializar Firebase
+initialize_firebase()
 
 
 # Configuración de Firebase con pyrebase

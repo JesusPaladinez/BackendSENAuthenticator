@@ -17,6 +17,25 @@ from decouple import config
 from datetime import timedelta
 from decouple import config
 import environ
+import os
+import json
+import firebase_admin
+from firebase_admin import credentials
+
+
+# Carga las credenciales desde la variable de entorno
+firebase_credential = os.getenv('FIREBASE_CREDENTIALS')
+
+if not firebase_credential:
+    raise Exception("Firebase credentials not found")
+
+# Convierte la cadena JSON a un diccionario
+cred_dict = json.loads(firebase_credential)
+cred = credentials.Certificate(cred_dict)
+
+# Inicializa Firebase
+firebase_admin.initialize_app(cred)
+
 
 # Inicializa el entorno
 env = environ.Env()
