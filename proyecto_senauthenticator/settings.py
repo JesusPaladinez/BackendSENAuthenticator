@@ -15,36 +15,6 @@ import os
 import dj_database_url
 from decouple import config
 from datetime import timedelta
-import environ
-import json
-import firebase_admin
-from firebase_admin import credentials
-from dotenv import load_dotenv
-
-# Cargar las variables de entorno desde el archivo .env
-load_dotenv()
-
-# Carga las credenciales desde la variable de entorno
-firebase_credential = os.getenv('FIREBASE_CREDENTIALS')
-
-if not firebase_credential:
-    raise Exception("Firebase credentials not found")
-
-# Depuración: imprime el contenido de firebase_credential
-print("Contenido de firebase_credential:", firebase_credential)
-
-try:
-    # Convierte la cadena JSON a un diccionario
-    cred_dict = json.loads(firebase_credential)
-    cred = credentials.Certificate(cred_dict)
-
-    # Inicializa Firebase
-    firebase_admin.initialize_app(cred, {
-        'storageBucket': 'projectstoragesenauthenticator.appspot.com'
-    })
-except json.JSONDecodeError as e:
-    print("Error al cargar JSON:", e)
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
