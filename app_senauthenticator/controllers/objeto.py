@@ -1,6 +1,6 @@
 import os
-# import json
-# import firebase_admin
+import json
+import firebase_admin
 from firebase_admin import credentials, storage as admin_storage
 from app_senauthenticator.models import Objeto
 from app_senauthenticator.serializers.objeto import ObjetoSerializer
@@ -10,35 +10,35 @@ from rest_framework import status
 import pyrebase
 
 
-# def initialize_firebase():
-#     try:
-#         # Obtener las credenciales desde la variable de entorno
-#         firebase_credential = os.getenv('FIREBASE_CREDENTIALS')
+def initialize_firebase():
+    try:
+        # Obtener las credenciales desde la variable de entorno
+        firebase_credential = os.getenv('FIREBASE_CREDENTIALS')
 
-#         # Verificar si las credenciales están presentes
-#         if not firebase_credential:
-#             raise Exception("Firebase credentials not found in environment variables")
+        # Verificar si las credenciales están presentes
+        if not firebase_credential:
+            raise Exception("Firebase credentials not found in environment variables")
 
-#         # Convertir la cadena JSON de credenciales en un diccionario
-#         cred_dict = json.loads(firebase_credential)
-#         cred = credentials.Certificate(cred_dict)
+        # Convertir la cadena JSON de credenciales en un diccionario
+        cred_dict = json.loads(firebase_credential)
+        cred = credentials.Certificate(cred_dict)
 
-#         # Inicializar la aplicación de Firebase con el bucket de almacenamiento
-#         try:
-#             firebase_admin.initialize_app(cred, {
-#                 'storageBucket': 'projectstoragesenauthenticator.appspot.com'
-#             })
-#         except ValueError as e:
-#             if 'The default Firebase app already exists' in str(e):
-#                 pass  # La aplicación ya está inicializada, continuar
-#             else:
-#                 raise e
+        # Inicializar la aplicación de Firebase con el bucket de almacenamiento
+        try:
+            firebase_admin.initialize_app(cred, {
+                'storageBucket': 'projectstoragesenauthenticator.appspot.com'
+            })
+        except ValueError as e:
+            if 'The default Firebase app already exists' in str(e):
+                pass  # La aplicación ya está inicializada, continuar
+            else:
+                raise e
 
-#     except Exception as e:
-#         # Manejar cualquier otra excepción
-#         raise e
+    except Exception as e:
+        # Manejar cualquier otra excepción
+        raise e
 
-# initialize_firebase()
+initialize_firebase()
 
 
 # Configuración de Firebase con pyrebase
