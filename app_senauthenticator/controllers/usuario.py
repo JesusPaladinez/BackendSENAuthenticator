@@ -13,6 +13,21 @@ import os
 import cv2
 import numpy as np
 
+import pyrebase
+
+config = {
+    "apiKey": os.getenv('FIREBASE_API_KEY'),
+    "authDomain": "projectstoragesenauthenticator.firebaseapp.com",
+    "projectId": "projectstoragesenauthenticator",
+    "storageBucket": "projectstoragesenauthenticator.appspot.com", 
+    "messagingSenderId": "371522976959",
+    "appId": "1:371522976959:web:f99bc5b20a440aaac5da0a",
+    "measurementId": "G-5TEEM4Y3P3",
+    "databaseURL": "https://projectstoragesenauthenticator-default-rtdb.firebaseio.com/"
+}
+
+firebase_storage = pyrebase.initialize_app(config)
+storage = firebase_storage.storage()
 
 @api_view(['GET', 'POST'])
 def usuarios_controlador(request):
@@ -99,7 +114,7 @@ def registrar_rostro(face_register, usuario_serializer):
         # Recortar el rostro detectado
         cropped_face = crop_face(face_ndarray, face_detected)
 
-        # Guardar la imagen final en formato PNG
+        # Guardar la imagen final en formato PNG localmente
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         face_directory = os.path.join(BASE_DIR, 'database', 'faces')
         os.makedirs(face_directory, exist_ok=True)
@@ -108,17 +123,29 @@ def registrar_rostro(face_register, usuario_serializer):
         face_path = os.path.join(face_directory, face_filename)
         cv2.imwrite(face_path, cropped_face)
 
-        # Guardar la imagen en formato ndarray en la carpeta 'matrices'
+        # Subir la imagen a Firebase Storage
+        storage_path = f"faces/{face_filename}"  # Ruta donde se guardará en Firebase
+        storage.child(storage_path).put(face_path)  # Subir la imagen local a Firebase
+
+        # Obtener la URL de descarga de la imagen en Firebase
+        face_url = storage.child(storage_path).get_url(None)
+
+        # Actualizar el campo face_register con la URL en la base de datos
+        usuario_serializer.instance.face_register = face_url
+        usuario_serializer.instance.save()
+
+        # Guardar la imagen en formato ndarray en la carpeta 'matrices' localmente
         matrices_directory = os.path.join(BASE_DIR, 'database', 'matrices')
         os.makedirs(matrices_directory, exist_ok=True)
         matrix_filename = f"{nombre_completo}.npy"
         matrix_path = os.path.join(matrices_directory, matrix_filename)
         np.save(matrix_path, face_ndarray)
 
-        return Response({"message": "Rostro registrado correctamente."}, status=status.HTTP_200_OK)
+        return Response({"message": "Rostro registrado correctamente.", "face_url": face_url}, status=status.HTTP_200_OK)
 
     except Exception as e:
         return Response({"error": f"Error al registrar el rostro: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['GET'])

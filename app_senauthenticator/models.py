@@ -63,7 +63,8 @@ class Usuario(AbstractUser):
     genero_usuario=models.CharField(max_length=9, choices=genero, blank=True, null=True, db_column='genero_usuario')  
     rol_usuario = models.CharField(max_length=20, choices=tipo_rol, blank=True, null=True, db_column='rol_usuario') 
     ficha_usuario=models.ForeignKey(Ficha, on_delete=models.PROTECT, blank=True, null=True, db_column='ficha_usuario')
-    face_register = models.ImageField(blank=True, null=True)
+    face_register = models.ImageField(blank=True, null=True, max_length=500)
+
     # nombre_usuario=models.CharField(max_length=50, db_column='nombre_usuario')
     # apellidos_usuario=models.CharField(max_length=50, db_column='apellidos_usuario')
     # correo_usuario=models.CharField(max_length=50, db_column='correo_personal_usuario') 
