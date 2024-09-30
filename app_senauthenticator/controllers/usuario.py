@@ -93,7 +93,10 @@ def crear_usuario(request):
             # Procesar el registro facial si se proporciona una imagen
             if 'face_register' in request.FILES:
                 face_image = request.FILES['face_register']
-                registrar_rostro(face_image, usuario)
+                image_url = registrar_rostro(face_image, usuario)
+
+                # Asignar la URL de la imagen al campo 'face_register'
+                request.data['face_register'] = image_url
 
             return response
         else:
@@ -159,10 +162,10 @@ def registrar_rostro(face_image, usuario):
         usuario.face_register = image_url
         usuario.save()
 
-        return Response({"message": "Rostro registrado correctamente.", "face_url": image_url}, status=status.HTTP_200_OK)
+        return image_url  # Retornar la URL de la imagen
 
     except Exception as e:
-        return Response({"error": f"Error al registrar el rostro: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        return {"error": f"Error al registrar el rostro: {str(e)}"}
 
 
 @api_view(['GET'])
