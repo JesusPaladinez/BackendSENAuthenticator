@@ -1,6 +1,13 @@
 from djongo import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
+from django_rest_passwordreset.signals import reset_password_token_created
+from django.dispatch import receiver 
+from django.urls import reverse 
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
+from django.utils.html import strip_tags
+
 
 tipo_documento_usuario=[
     ('Cédula de ciudadanía','Cédula de ciudadanía'),
@@ -167,3 +174,18 @@ class PasswordReset(models.Model):
     
     def __str__(self):
         return f"password reset for {self.usuario.username} with name {self.usuario.first_name} at {self.created_when}"
+    
+
+@receiver(reset_password_token_created)
+def password_reset_token_created(reset_password_token, *args, **kwargs):
+    sitelink = "http://localhost:5173/"
+    token = "{}".format(reset_password_token.key)
+    full_link = str(sitelink)+str("password-reset/")+str(token)
+
+    print(token)
+    print(full_link)
+
+    context = {
+        'full_link': full_link,
+        'email_adress': reset_password_token.user.email
+    }
