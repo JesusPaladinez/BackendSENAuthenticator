@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from firebase_admin import storage as admin_storage
 
 # Librerías para el reconocimiento facial
 from app_senauthenticator.utils.face_utils import convert_to_ndarray, detect_face_dlib, crop_face
@@ -114,38 +115,48 @@ def registrar_rostro(face_register, usuario_serializer):
         # Recortar el rostro detectado
         cropped_face = crop_face(face_ndarray, face_detected)
 
-        # Guardar la imagen final en formato PNG localmente
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        face_directory = os.path.join(BASE_DIR, 'database', 'faces')
-        os.makedirs(face_directory, exist_ok=True)
-        nombre_completo = f"{usuario_serializer.validated_data.get('first_name')} {usuario_serializer.validated_data.get('last_name')}"
-        face_filename = f"{nombre_completo}.png"
-        face_path = os.path.join(face_directory, face_filename)
-        cv2.imwrite(face_path, cropped_face)
+        # Crear el nombre de archivo utilizando el nombre y número de documento del usuario
+        first_name = usuario_serializer.validated_data.get('first_name')
+        numero_documento = usuario_serializer.validated_data.get('numero_documento_usuario')
+        face_filename = f"{first_name} - {numero_documento}.jpg"
 
-        # Subir la imagen a Firebase Storage
-        storage_path = f"faces/{face_filename}"  # Ruta donde se guardará en Firebase
-        storage.child(storage_path).put(face_path)  # Subir la imagen local a Firebase
+        # Convertir la imagen a bytes para subirla a Firebase
+        _, buffer = cv2.imencode('.jpg', cropped_face)
+        file_bytes = buffer.tobytes()
 
-        # Obtener la URL de descarga de la imagen en Firebase
-        face_url = storage.child(storage_path).get_url(None)
+        # Subir la imagen PNG a Firebase Storage
+        storage_path = f"faces/{face_filename}"
+        storage.child(storage_path).put(file_bytes)
 
-        # Actualizar el campo face_register con la URL en la base de datos
-        usuario_serializer.instance.face_register = face_url
+        # Obtener la URL pública de la imagen
+        image_metadata = storage.child(storage_path).get_url(None)
+        bucket = admin_storage.bucket()
+        blob = bucket.blob(storage_path)
+        blob.reload()
+
+        # Verificar si existe el token de descarga en los metadatos
+        token = blob.metadata.get('firebaseStorageDownloadTokens')
+        if not token:
+            raise Exception("Download token not found in blob metadata")
+
+        image_url = f"{image_metadata}&token={token}"
+
+        # Guardar la imagen en formato ndarray en la carpeta 'ndarray/' en Firebase Storage
+        ndarray_filename = f"{first_name} - {numero_documento}.npy"
+        matrix_path = f"ndarray/{ndarray_filename}"
+        np_bytes = np.save(matrix_path, face_ndarray)
+
+        # Subir el archivo .npy a Firebase Storage
+        storage.child(matrix_path).put(np_bytes)
+
+        # Actualizar la URL del rostro en el usuario
+        usuario_serializer.instance.face_register = image_url
         usuario_serializer.instance.save()
 
-        # Guardar la imagen en formato ndarray en la carpeta 'matrices' localmente
-        matrices_directory = os.path.join(BASE_DIR, 'database', 'matrices')
-        os.makedirs(matrices_directory, exist_ok=True)
-        matrix_filename = f"{nombre_completo}.npy"
-        matrix_path = os.path.join(matrices_directory, matrix_filename)
-        np.save(matrix_path, face_ndarray)
-
-        return Response({"message": "Rostro registrado correctamente.", "face_url": face_url}, status=status.HTTP_200_OK)
+        return Response({"message": "Rostro registrado correctamente.", "face_url": image_url, "face_ndarray": face_ndarray}, status=status.HTTP_200_OK)
 
     except Exception as e:
         return Response({"error": f"Error al registrar el rostro: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @api_view(['GET'])

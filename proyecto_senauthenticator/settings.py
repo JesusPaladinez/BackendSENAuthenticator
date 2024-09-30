@@ -172,6 +172,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://backendsenauthenticator.onrender.com',  # URL de producción
     'https://backprojecto.onrender.com',
     'https://senauthenticator.onrender.com',
+    'https://backendsenauthenticator.up.railway.app',
 ]
 
 # Configurar el tiempo máximo para caché de pre-vuelo (en segundos)
