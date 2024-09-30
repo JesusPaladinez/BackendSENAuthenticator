@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'coreapi', # módulo para documentar el código    
     'whitenoise.runserver_nostatic', # Módulo para subir archivos estaticos 
     'app_senauthenticator', 
+    'django_rest_passwordreset',
 ]
 
 MIDDLEWARE = [
@@ -67,7 +68,7 @@ ROOT_URLCONF = 'proyecto_senauthenticator.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/"templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,include
 from app_senauthenticator.controllers import programa, ficha, usuario, objeto, ingreso, tutor, oficina, usuario_externo, recuperar_contraseña
 from app_senauthenticator.controllers.registro_facial import RegistroFacial
 from app_senauthenticator.controllers.inicio_sesion_facial import InicioSesionFacial
