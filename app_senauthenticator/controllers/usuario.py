@@ -7,6 +7,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from firebase_admin import storage as admin_storage
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 import io
 
 # Librerías para el reconocimiento facial
@@ -14,8 +16,8 @@ from app_senauthenticator.utils.face_utils import convert_to_ndarray, detect_fac
 import os
 import cv2
 import numpy as np
-
 import pyrebase
+
 
 config = {
     "apiKey": os.getenv('FIREBASE_API_KEY'),
@@ -30,6 +32,7 @@ config = {
 
 firebase_storage = pyrebase.initialize_app(config)
 storage = firebase_storage.storage()
+
 
 @api_view(['GET', 'POST'])
 def usuarios_controlador(request):
@@ -94,9 +97,14 @@ def crear_usuario(request):
             if 'face_register' in request.FILES:
                 face_image = request.FILES['face_register']
                 image_url = registrar_rostro(face_image, usuario)
-
-                # Asignar la URL de la imagen al campo 'face_register'
-                request.data['face_register'] = image_url
+                
+                # Validar la URL antes de asignarla
+                validate = URLValidator()
+                try:
+                    validate(image_url)
+                    request.data['face_register'] = image_url
+                except ValidationError:
+                    return Response({'error': 'La URL generada para el registro facial no es válida.', 'img_url': image_url}, status=status.HTTP_400_BAD_REQUEST)
 
             return response
         else:
