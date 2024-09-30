@@ -90,8 +90,8 @@ def crear_usuario(request):
             )
 
             # Procesar el registro facial si se proporciona una imagen
-            if 'face_register' in request.data:
-                return registrar_rostro(request.data['face_register'], usuario_serializer)
+            if 'face_register' in request.FILES:
+                return registrar_rostro(request.FILES['face_register'], usuario_serializer)
 
             return response
         else:
@@ -100,7 +100,6 @@ def crear_usuario(request):
         return Response({'error': f'Campo faltante: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({'error': f'Error al crear el usuario: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 def registrar_rostro(face_register, usuario_serializer):
     try:
@@ -124,7 +123,7 @@ def registrar_rostro(face_register, usuario_serializer):
         _, buffer = cv2.imencode('.jpg', cropped_face)
         file_bytes = buffer.tobytes()
 
-        # Subir la imagen PNG a Firebase Storage
+        # Subir la imagen JPG a Firebase Storage
         storage_path = f"faces/{face_filename}"
         storage.child(storage_path).put(file_bytes)
 
@@ -143,17 +142,21 @@ def registrar_rostro(face_register, usuario_serializer):
 
         # Guardar la imagen en formato ndarray en la carpeta 'ndarray/' en Firebase Storage
         ndarray_filename = f"{first_name} - {numero_documento}.npy"
-        matrix_path = f"ndarray/{ndarray_filename}"
-        np_bytes = np.save(matrix_path, face_ndarray)
+        npy_file_path = f"ndarray/{ndarray_filename}"
+
+        # Convertir la matriz ndarray a bytes para subirla
+        with io.BytesIO() as output:
+            np.save(output, face_ndarray)
+            npy_bytes = output.getvalue()
 
         # Subir el archivo .npy a Firebase Storage
-        storage.child(matrix_path).put(np_bytes)
+        storage.child(npy_file_path).put(npy_bytes)
 
         # Actualizar la URL del rostro en el usuario
         usuario_serializer.instance.face_register = image_url
         usuario_serializer.instance.save()
 
-        return Response({"message": "Rostro registrado correctamente.", "face_url": image_url, "face_ndarray": face_ndarray}, status=status.HTTP_200_OK)
+        return Response({"message": "Rostro registrado correctamente.", "face_url": image_url}, status=status.HTTP_200_OK)
 
     except Exception as e:
         return Response({"error": f"Error al registrar el rostro: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
