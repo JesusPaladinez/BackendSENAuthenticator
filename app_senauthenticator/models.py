@@ -63,7 +63,8 @@ class Usuario(AbstractUser):
     genero_usuario=models.CharField(max_length=9, choices=genero, blank=True, null=True, db_column='genero_usuario')  
     rol_usuario = models.CharField(max_length=20, choices=tipo_rol, blank=True, null=True, db_column='rol_usuario') 
     ficha_usuario=models.ForeignKey(Ficha, on_delete=models.PROTECT, blank=True, null=True, db_column='ficha_usuario')
-    face_register = models.ImageField(blank=True, null=True)
+    face_register = models.URLField(blank=True, null=True, max_length=500, db_column='face_register')
+
     # nombre_usuario=models.CharField(max_length=50, db_column='nombre_usuario')
     # apellidos_usuario=models.CharField(max_length=50, db_column='apellidos_usuario')
     # correo_usuario=models.CharField(max_length=50, db_column='correo_personal_usuario') 
@@ -104,7 +105,9 @@ class Oficina(models.Model):
 class UsuarioExterno(AbstractUser):
     tipo_documento_usuario_externo=models.CharField(max_length=50, choices=tipo_documento_usuario, default='Cedula de ciudadania', db_column='tipo_documento_usuario')
     numero_documento_usuario_externo=models.CharField(max_length=20, unique=True, db_column='numero_documento_usuario')
+    descripcion_usuario_externo=models.TextField(db_column='descripcion_usuario_externo')
     oficina_usuario_externo = models.ForeignKey(Oficina, on_delete=models.PROTECT, db_column='oficina')
+    
 
 
     REQUIRED_FIELDS = 'numero_documento_usuario' # se cambia el username por el numero_documento_usuario para poder autenticarse

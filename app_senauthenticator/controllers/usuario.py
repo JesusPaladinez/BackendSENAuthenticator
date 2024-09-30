@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from firebase_admin import storage as admin_storage
+import io
 
 # Librerías para el reconocimiento facial
 from app_senauthenticator.utils.face_utils import convert_to_ndarray, detect_face_dlib, crop_face
@@ -13,6 +15,21 @@ import os
 import cv2
 import numpy as np
 
+import pyrebase
+
+config = {
+    "apiKey": os.getenv('FIREBASE_API_KEY'),
+    "authDomain": "projectstoragesenauthenticator.firebaseapp.com",
+    "projectId": "projectstoragesenauthenticator",
+    "storageBucket": "projectstoragesenauthenticator.appspot.com", 
+    "messagingSenderId": "371522976959",
+    "appId": "1:371522976959:web:f99bc5b20a440aaac5da0a",
+    "measurementId": "G-5TEEM4Y3P3",
+    "databaseURL": "https://projectstoragesenauthenticator-default-rtdb.firebaseio.com/"
+}
+
+firebase_storage = pyrebase.initialize_app(config)
+storage = firebase_storage.storage()
 
 @api_view(['GET', 'POST'])
 def usuarios_controlador(request):
@@ -23,13 +40,13 @@ def usuarios_controlador(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-def usuario_detalle_controlador(request, pk):
+def usuarios_detalle_controlador(request, pk):
     if request.method == 'GET':
-        return obtener_usuario(request, pk)
+        return obtener_usuario(request._request, pk)
     elif request.method == 'PUT':
-        return actualizar_usuario(request, pk)
+        return actualizar_usuario(request._request, pk)
     elif request.method == 'DELETE':
-        return eliminar_usuario(request, pk)
+        return eliminar_usuario(request._request, pk)
 
 
 @api_view(['GET'])
@@ -52,7 +69,7 @@ def crear_usuario(request):
         # Asignar el número de documento al campo username
         request.data['username'] = numero_documento
 
-        # Crear un nuevo usuario con los datos actualizados
+        # Crear un nuevo usuario con los datos actualizados (sin el face_register aún)
         usuario_serializer = UsuarioSerializer(data=request.data)
         if usuario_serializer.is_valid():
             usuario = usuario_serializer.save()
@@ -74,8 +91,12 @@ def crear_usuario(request):
             )
 
             # Procesar el registro facial si se proporciona una imagen
-            if 'face_register' in request.data:
-                return registrar_rostro(request.data['face_register'], usuario_serializer)
+            if 'face_register' in request.FILES:
+                face_image = request.FILES['face_register']
+                image_url = registrar_rostro(face_image, usuario)
+
+                # Asignar la URL de la imagen al campo 'face_register'
+                request.data['face_register'] = image_url
 
             return response
         else:
@@ -86,10 +107,10 @@ def crear_usuario(request):
         return Response({'error': f'Error al crear el usuario: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def registrar_rostro(face_register, usuario_serializer):
+def registrar_rostro(face_image, usuario):
     try:
         # Convertir la imagen a ndarray
-        face_ndarray = convert_to_ndarray(face_register)
+        face_ndarray = convert_to_ndarray(face_image)
 
         # Detectar el rostro en la imagen
         face_detected = detect_face_dlib(face_ndarray)
@@ -99,26 +120,52 @@ def registrar_rostro(face_register, usuario_serializer):
         # Recortar el rostro detectado
         cropped_face = crop_face(face_ndarray, face_detected)
 
-        # Guardar la imagen final en formato PNG
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        face_directory = os.path.join(BASE_DIR, 'database', 'faces')
-        os.makedirs(face_directory, exist_ok=True)
-        nombre_completo = f"{usuario_serializer.validated_data.get('first_name')} {usuario_serializer.validated_data.get('last_name')}"
-        face_filename = f"{nombre_completo}.png"
-        face_path = os.path.join(face_directory, face_filename)
-        cv2.imwrite(face_path, cropped_face)
+        # Crear el nombre de archivo utilizando el nombre y número de documento del usuario
+        first_name = usuario.first_name
+        numero_documento = usuario.numero_documento_usuario
+        face_filename = f"{first_name} - {numero_documento}.jpg"
 
-        # Guardar la imagen en formato ndarray en la carpeta 'matrices'
-        matrices_directory = os.path.join(BASE_DIR, 'database', 'matrices')
-        os.makedirs(matrices_directory, exist_ok=True)
-        matrix_filename = f"{nombre_completo}.npy"
-        matrix_path = os.path.join(matrices_directory, matrix_filename)
-        np.save(matrix_path, face_ndarray)
+        # Convertir la imagen a bytes para subirla a Firebase
+        _, buffer = cv2.imencode('.jpg', cropped_face)
+        file_bytes = buffer.tobytes()
 
-        return Response({"message": "Rostro registrado correctamente."}, status=status.HTTP_200_OK)
+        # Subir la imagen JPG a Firebase Storage
+        storage_path = f"faces/{face_filename}"
+        storage.child(storage_path).put(file_bytes)
+
+        # Obtener la URL pública de la imagen
+        image_metadata = storage.child(storage_path).get_url(None)
+        bucket = admin_storage.bucket()
+        blob = bucket.blob(storage_path)
+        blob.reload()
+
+        # Verificar si existe el token de descarga en los metadatos
+        token = blob.metadata.get('firebaseStorageDownloadTokens')
+        if not token:
+            raise Exception("Download token not found in blob metadata")
+
+        image_url = f"{image_metadata}&token={token}"
+
+        # Guardar la imagen en formato ndarray en la carpeta 'ndarray/' en Firebase Storage
+        ndarray_filename = f"{first_name} - {numero_documento}.npy"
+        npy_file_path = f"ndarray/{ndarray_filename}"
+
+        # Convertir la matriz ndarray a bytes para subirla
+        with io.BytesIO() as output:
+            np.save(output, face_ndarray)
+            npy_bytes = output.getvalue()
+
+        # Subir el archivo .npy a Firebase Storage
+        storage.child(npy_file_path).put(npy_bytes)
+
+        # Actualizar el campo face_register en el usuario con la URL de la imagen
+        usuario.face_register = image_url
+        usuario.save()
+
+        return image_url  # Retornar la URL de la imagen
 
     except Exception as e:
-        return Response({"error": f"Error al registrar el rostro: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        return {"error": f"Error al registrar el rostro: {str(e)}"}
 
 
 @api_view(['GET'])
@@ -191,3 +238,5 @@ def inicio_sesion(request):
 @permission_classes([IsAuthenticated])  # Extrae y verifica el token enviado en la cabecera Authorization es válido.
 def validarToken(request):
     return Response({'message': 'Usuario autenticado correctamente'}, status=200)
+
+

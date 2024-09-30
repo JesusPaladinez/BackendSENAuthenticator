@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\SENA\\source\\repos\\BackendSENAuthenticator\\",
+  "WorkspaceRootPath": "C:\\Users\\SENA\\Documents\\ProyectoIns\\BackendSENAuthenticator\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\SENA\\source\\repos\\BackendSENAuthenticator\\requirements.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\SENA\\Documents\\ProyectoIns\\BackendSENAuthenticator\\requirements.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:requirements.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
@@ -20,11 +20,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "requirements.txt",
-              "DocumentMoniker": "C:\\Users\\SENA\\source\\repos\\BackendSENAuthenticator\\requirements.txt",
+              "DocumentMoniker": "C:\\Users\\SENA\\Documents\\ProyectoIns\\BackendSENAuthenticator\\requirements.txt",
               "RelativeDocumentMoniker": "requirements.txt",
-              "ToolTip": "C:\\Users\\SENA\\source\\repos\\BackendSENAuthenticator\\requirements.txt",
+              "ToolTip": "C:\\Users\\SENA\\Documents\\ProyectoIns\\BackendSENAuthenticator\\requirements.txt",
               "RelativeToolTip": "requirements.txt",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAG0AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAFcAAAAAAAAAAAAAAHEAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
               "WhenOpened": "2024-08-16T14:30:37.225Z",
               "EditorCaption": ""

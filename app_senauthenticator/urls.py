@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,include
 from app_senauthenticator.controllers import programa, ficha, usuario, objeto, ingreso, tutor, oficina, usuario_externo, recuperar_contraseña
 from app_senauthenticator.controllers.registro_facial import RegistroFacial
 from app_senauthenticator.controllers.inicio_sesion_facial import InicioSesionFacial
@@ -18,15 +18,15 @@ urlpatterns = [
     path('fichas/<int:pk>/', ficha.ficha_controlador, name="cont_ficha"),
     # Usuario
     path('usuarios/', usuario.usuarios_controlador, name="cont_usuario"),
-    path('usuarios/<int:pk>/', usuario.usuario_detalle_controlador, name="cont_usuario_detail"), 
+    path('usuarios/<int:pk>/', usuario.usuarios_detalle_controlador, name="cont_usuario_detail"), 
     path('inicio-sesion/', usuario.inicio_sesion, name="inicio_sesion"),
     path('validar-token/', usuario.validarToken, name='protected_view'),
     # Usuario Externo
     path('usuarios-externos/', usuario_externo.usuario_externo_controlador, name="cont_usuario_externo"),
     path('usuarios-externos/<int:pk>/', usuario_externo.usuario_externo_controlador, name="cont_usuario_externo"), 
     # Objeto
-    path('objetos/', objeto.objeto_controlador, name="cont_objeto"),
-    path('objetos/<int:pk>/', objeto.objeto_controlador, name="cont_objeto"),
+    path('objetos/', objeto.objetos_controlador, name="cont_objeto"),
+    path('objetos/<int:pk>/', objeto.objetos_detalle_controlador, name="cont_objeto"),
     # Tutor
     path('tutores/', tutor.tutor_controlador),
     path('tutores/<int:pk>/', tutor.tutor_controlador),
@@ -41,7 +41,6 @@ urlpatterns = [
     path('ingreso/', ingreso.ingreso_controlador),
     path('ingreso/<int:pk>/', ingreso.ingreso_controlador),
     path('inicioSesion/', usuario.inicio_sesion),
-
     # recuperar contraseña
     path('forgotpassword/', recuperar_contraseña.ForgotPassword, name='forgot-password'),
     path('passwordresetsent/<str:reset_id>/', recuperar_contraseña.PasswordResetSent, name='password-reset-sent'),
