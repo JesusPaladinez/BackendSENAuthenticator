@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from firebase_admin import storage as admin_storage
+import io
 
 # Librerías para el reconocimiento facial
 from app_senauthenticator.utils.face_utils import convert_to_ndarray, detect_face_dlib, crop_face
@@ -68,7 +69,7 @@ def crear_usuario(request):
         # Asignar el número de documento al campo username
         request.data['username'] = numero_documento
 
-        # Crear un nuevo usuario con los datos actualizados
+        # Crear un nuevo usuario con los datos actualizados (sin el face_register aún)
         usuario_serializer = UsuarioSerializer(data=request.data)
         if usuario_serializer.is_valid():
             usuario = usuario_serializer.save()
@@ -91,7 +92,8 @@ def crear_usuario(request):
 
             # Procesar el registro facial si se proporciona una imagen
             if 'face_register' in request.FILES:
-                return registrar_rostro(request.FILES['face_register'], usuario_serializer)
+                face_image = request.FILES['face_register']
+                registrar_rostro(face_image, usuario)
 
             return response
         else:
@@ -101,10 +103,11 @@ def crear_usuario(request):
     except Exception as e:
         return Response({'error': f'Error al crear el usuario: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-def registrar_rostro(face_register, usuario_serializer):
+
+def registrar_rostro(face_image, usuario):
     try:
         # Convertir la imagen a ndarray
-        face_ndarray = convert_to_ndarray(face_register)
+        face_ndarray = convert_to_ndarray(face_image)
 
         # Detectar el rostro en la imagen
         face_detected = detect_face_dlib(face_ndarray)
@@ -115,8 +118,8 @@ def registrar_rostro(face_register, usuario_serializer):
         cropped_face = crop_face(face_ndarray, face_detected)
 
         # Crear el nombre de archivo utilizando el nombre y número de documento del usuario
-        first_name = usuario_serializer.validated_data.get('first_name')
-        numero_documento = usuario_serializer.validated_data.get('numero_documento_usuario')
+        first_name = usuario.first_name
+        numero_documento = usuario.numero_documento_usuario
         face_filename = f"{first_name} - {numero_documento}.jpg"
 
         # Convertir la imagen a bytes para subirla a Firebase
@@ -152,9 +155,9 @@ def registrar_rostro(face_register, usuario_serializer):
         # Subir el archivo .npy a Firebase Storage
         storage.child(npy_file_path).put(npy_bytes)
 
-        # Actualizar la URL del rostro en el usuario
-        usuario_serializer.instance.face_register = image_url
-        usuario_serializer.instance.save()
+        # Actualizar el campo face_register en el usuario con la URL de la imagen
+        usuario.face_register = image_url
+        usuario.save()
 
         return Response({"message": "Rostro registrado correctamente.", "face_url": image_url}, status=status.HTTP_200_OK)
 
