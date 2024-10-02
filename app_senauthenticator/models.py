@@ -138,7 +138,7 @@ class Objeto(models.Model):
     marca_objeto = models.CharField(max_length=20, db_column='marca_objeto')
     modelo_objeto = models.CharField(max_length=20, db_column='modelo_objeto')
     descripcion_objeto = models.TextField(db_column='descripcion_objeto')
-    foto_objeto = models.URLField(max_length=300,db_column='foto_objeto', blank=True, null=True)  # Guardarás la URL aquí
+    foto_objeto = models.URLField(max_length=300,db_column='foto_objeto', blank=True, null=True) 
     usuario_objeto = models.ForeignKey(Usuario, on_delete=models.PROTECT, db_column='usuario_objeto')
 
     def __str__(self) -> str:

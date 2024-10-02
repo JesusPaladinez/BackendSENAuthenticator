@@ -94,8 +94,18 @@ def crear_usuario(request):
             )
 
             # Procesar el registro facial si se proporciona una imagen
-            if 'face_register' in request.data:
-                return registrar_rostro(request.data['face_register'], usuario_serializer)
+            if 'face_register' in request.FILES:
+                face_image = request.FILES['face_register']
+                image_url = registrar_rostro(face_image, usuario)
+                
+                # Validar la URL antes de asignarla
+                validate = URLValidator()
+                try:
+                    validate(image_url)
+                    usuario.face_register = image_url
+                    usuario.save()
+                except ValidationError:
+                    return Response({'error': 'La URL generada para el registro facial no es válida.'}, status=status.HTTP_400_BAD_REQUEST)
 
             return response
         else:
@@ -119,18 +129,19 @@ def registrar_rostro(face_register, usuario_serializer):
         # Recortar el rostro detectado
         cropped_face = crop_face(face_ndarray, face_detected)
 
-        # Guardar la imagen final en formato PNG localmente
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        face_directory = os.path.join(BASE_DIR, 'database', 'faces')
-        os.makedirs(face_directory, exist_ok=True)
-        nombre_completo = f"{usuario_serializer.validated_data.get('first_name')} {usuario_serializer.validated_data.get('last_name')}"
-        face_filename = f"{nombre_completo}.png"
-        face_path = os.path.join(face_directory, face_filename)
-        cv2.imwrite(face_path, cropped_face)
+        # Guardar la imagen final en formato JPG localmente
+        # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # face_directory = os.path.join(BASE_DIR, 'database', 'faces')
+        # os.makedirs(face_directory, exist_ok=True)
+        face_filename = f"{usuario_serializer.validated_data.get('first_name')} - {usuario_serializer.validated_data.get('numero_documento_usuario')}"
+        # face_filename = f"{nombre_completo}.jpg"
+        # face_path = os.path.join(face_directory, face_filename)
+        # cv2.imwrite(face_path, cropped_face)
 
         # Subir la imagen a Firebase Storage
         storage_path = f"faces/{face_filename}"  # Ruta donde se guardará en Firebase
-        storage.child(storage_path).put(face_path)  # Subir la imagen local a Firebase
+        file_bytes = cropped_face.read()
+        storage.child(storage_path).put(file_bytes)  # Subir la imagen a Firebase
 
         # Obtener la URL de descarga de la imagen en Firebase
         face_url = storage.child(storage_path).get_url(None)
@@ -139,12 +150,12 @@ def registrar_rostro(face_register, usuario_serializer):
         usuario_serializer.instance.face_register = face_url
         usuario_serializer.instance.save()
 
-        # Guardar la imagen en formato ndarray en la carpeta 'matrices' localmente
-        matrices_directory = os.path.join(BASE_DIR, 'database', 'matrices')
-        os.makedirs(matrices_directory, exist_ok=True)
-        matrix_filename = f"{nombre_completo}.npy"
-        matrix_path = os.path.join(matrices_directory, matrix_filename)
-        np.save(matrix_path, face_ndarray)
+        # # Guardar la imagen en formato ndarray en la carpeta 'matrices' localmente
+        # matrices_directory = os.path.join(BASE_DIR, 'database', 'matrices')
+        # os.makedirs(matrices_directory, exist_ok=True)
+        # matrix_filename = f"{nombre_completo}.npy"
+        # matrix_path = os.path.join(matrices_directory, matrix_filename)
+        # np.save(matrix_path, face_ndarray)
 
         return Response({"message": "Rostro registrado correctamente.", "face_url": face_url}, status=status.HTTP_200_OK)
 
