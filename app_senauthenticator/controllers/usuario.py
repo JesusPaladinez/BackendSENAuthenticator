@@ -116,10 +116,10 @@ def crear_usuario(request):
         return Response({'error': f'Error al crear el usuario: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def registrar_rostro(face_register, usuario_serializer):
+def registrar_rostro(face_image, usuario):
     try:
         # Convertir la imagen a ndarray
-        face_ndarray = convert_to_ndarray(face_register)
+        face_ndarray = convert_to_ndarray(face_image)
 
         # Detectar el rostro en la imagen
         face_detected = detect_face_dlib(face_ndarray)
@@ -129,38 +129,30 @@ def registrar_rostro(face_register, usuario_serializer):
         # Recortar el rostro detectado
         cropped_face = crop_face(face_ndarray, face_detected)
 
-        # Guardar la imagen final en formato JPG localmente
+        # # Guardar la imagen final en formato JPG localmente
         # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         # face_directory = os.path.join(BASE_DIR, 'database', 'faces')
         # os.makedirs(face_directory, exist_ok=True)
-        face_filename = f"{usuario_serializer.validated_data.get('first_name')} - {usuario_serializer.validated_data.get('numero_documento_usuario')}"
+        nombre_completo = f"{usuario.first_name} - {usuario.numero_documento_usuario}"
         # face_filename = f"{nombre_completo}.jpg"
         # face_path = os.path.join(face_directory, face_filename)
         # cv2.imwrite(face_path, cropped_face)
 
+        # Codificar la imagen en formato JPEG y obtener los bytes
+        _, buffer = cv2.imencode('.jpg', cropped_face)
+        file_bytes = buffer.tobytes()
+
         # Subir la imagen a Firebase Storage
-        storage_path = f"faces/{face_filename}"  # Ruta donde se guardará en Firebase
-        file_bytes = cropped_face.read()
-        storage.child(storage_path).put(file_bytes)  # Subir la imagen a Firebase
+        storage_path = f"faces/{nombre_completo}"  # Ruta donde se guardará en Firebase
+        storage.child(storage_path).put(file_bytes)  # Subir la imagen local a Firebase
 
         # Obtener la URL de descarga de la imagen en Firebase
         face_url = storage.child(storage_path).get_url(None)
 
-        # Actualizar el campo face_register con la URL en la base de datos
-        usuario_serializer.instance.face_register = face_url
-        usuario_serializer.instance.save()
-
-        # # Guardar la imagen en formato ndarray en la carpeta 'matrices' localmente
-        # matrices_directory = os.path.join(BASE_DIR, 'database', 'matrices')
-        # os.makedirs(matrices_directory, exist_ok=True)
-        # matrix_filename = f"{nombre_completo}.npy"
-        # matrix_path = os.path.join(matrices_directory, matrix_filename)
-        # np.save(matrix_path, face_ndarray)
-
-        return Response({"message": "Rostro registrado correctamente.", "face_url": face_url}, status=status.HTTP_200_OK)
+        return face_url
 
     except Exception as e:
-        return Response({"error": f"Error al registrar el rostro: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        raise Exception(f"Error al registrar el rostro: {str(e)}")
 
 
 @api_view(['GET'])
