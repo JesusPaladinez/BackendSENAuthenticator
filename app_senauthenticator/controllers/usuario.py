@@ -119,15 +119,20 @@ def crear_usuario(request):
 def registrar_rostro(face_image, usuario):
     try:
         # Convertir la imagen a ndarray
-        face_ndarray = convert_to_ndarray(face_image)
+        # face_ndarray = convert_to_ndarray(face_image)
 
         # Detectar el rostro en la imagen
-        face_detected = detect_face_dlib(face_ndarray)
+        face_detected = detect_face_dlib(face_image)
         if face_detected is None:
             raise ValueError("No se detectó ningún rostro en la imagen proporcionada.")
+        
+        # Convertir la imagen a escala de grises
+        face_gray = cv2.cvtColor(face_detected, cv2.COLOR_BGR2GRAY)
+        
+        file_bytes = face_gray.read()
 
         # Recortar el rostro detectado
-        cropped_face = crop_face(face_ndarray, face_detected)
+        # cropped_face = crop_face(face_ndarray, face_detected)
 
         # # Guardar la imagen final en formato JPG localmente
         # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -139,8 +144,8 @@ def registrar_rostro(face_image, usuario):
         # cv2.imwrite(face_path, cropped_face)
 
         # Codificar la imagen en formato JPEG y obtener los bytes
-        _, buffer = cv2.imencode('.jpg', cropped_face)
-        file_bytes = buffer.tobytes()
+        # _, buffer = cv2.imencode('.jpg', cropped_face)
+        # file_bytes = buffer.tobytes()
 
         # Subir la imagen a Firebase Storage
         storage_path = f"faces/{nombre_completo}"  # Ruta donde se guardará en Firebase
