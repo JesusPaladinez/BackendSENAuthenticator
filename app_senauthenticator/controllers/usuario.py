@@ -68,14 +68,14 @@ def crear_usuario(request):
         # Procesar el registro facial si se proporciona una imagen
         if 'face_register' in request.FILES:
             face_image = request.FILES['face_register']
-            image_url = registrar_rostro(face_image, usuario)
+            # image_url = registrar_rostro(face_image, usuario)
+            image_url = registrar_rostro(face_image)
             
             # Validar la URL antes de asignarla
             validate = URLValidator()
             try:
                 validate(image_url)
-                usuario.face_register = image_url
-                usuario.save()
+                request.data['face_register'] = image_url
             except ValidationError:
                 return Response({'error': 'La URL generada para el registro facial no es válida.'}, status=status.HTTP_400_BAD_REQUEST)
 
