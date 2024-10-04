@@ -65,6 +65,20 @@ def obtener_usuarios(request):
 @api_view(['POST'])
 def crear_usuario(request):
     try:
+        # Procesar el registro facial si se proporciona una imagen
+        if 'face_register' in request.FILES:
+            face_image = request.FILES['face_register']
+            image_url = registrar_rostro(face_image, usuario)
+            
+            # Validar la URL antes de asignarla
+            validate = URLValidator()
+            try:
+                validate(image_url)
+                usuario.face_register = image_url
+                usuario.save()
+            except ValidationError:
+                return Response({'error': 'La URL generada para el registro facial no es válida.'}, status=status.HTTP_400_BAD_REQUEST)
+
         numero_documento = request.data.get('numero_documento_usuario')
         if not numero_documento:
             return Response({'error': 'El número de documento es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -92,21 +106,6 @@ def crear_usuario(request):
                 secure=True,
                 samesite='None'
             )
-
-            # Procesar el registro facial si se proporciona una imagen
-            if 'face_register' in request.FILES:
-                face_image = request.FILES['face_register']
-                image_url = registrar_rostro(face_image, usuario)
-                
-                # Validar la URL antes de asignarla
-                validate = URLValidator()
-                try:
-                    validate(image_url)
-                    usuario.face_register = image_url
-                    usuario.save()
-                except ValidationError:
-                    return Response({'error': 'La URL generada para el registro facial no es válida.'}, status=status.HTTP_400_BAD_REQUEST)
-
             return response
         else:
             return Response(usuario_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -116,20 +115,21 @@ def crear_usuario(request):
         return Response({'error': f'Error al crear el usuario: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def registrar_rostro(face_image, usuario):
+# def registrar_rostro(face_image, usuario):
+def registrar_rostro(face_image):
     try:
         # Convertir la imagen a ndarray
         # face_ndarray = convert_to_ndarray(face_image)
 
         # Detectar el rostro en la imagen
-        face_detected = detect_face_dlib(face_image)
-        if face_detected is None:
-            raise ValueError("No se detectó ningún rostro en la imagen proporcionada.")
+        # face_detected = detect_face_dlib(face_image)
+        # if face_detected is None:
+        #     raise ValueError("No se detectó ningún rostro en la imagen proporcionada.")
         
         # Convertir la imagen a escala de grises
-        face_gray = cv2.cvtColor(face_detected, cv2.COLOR_BGR2GRAY)
+        # face_gray = cv2.cvtColor(face_detected, cv2.COLOR_BGR2GRAY)
         
-        file_bytes = face_gray.read()
+        file_bytes = face_image.read()
 
         # Recortar el rostro detectado
         # cropped_face = crop_face(face_ndarray, face_detected)
@@ -138,7 +138,7 @@ def registrar_rostro(face_image, usuario):
         # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         # face_directory = os.path.join(BASE_DIR, 'database', 'faces')
         # os.makedirs(face_directory, exist_ok=True)
-        nombre_completo = f"{usuario.first_name} - {usuario.numero_documento_usuario}"
+        # nombre_completo = f"{usuario.first_name} - {usuario.numero_documento_usuario}"
         # face_filename = f"{nombre_completo}.jpg"
         # face_path = os.path.join(face_directory, face_filename)
         # cv2.imwrite(face_path, cropped_face)
@@ -148,7 +148,7 @@ def registrar_rostro(face_image, usuario):
         # file_bytes = buffer.tobytes()
 
         # Subir la imagen a Firebase Storage
-        storage_path = f"faces/{nombre_completo}"  # Ruta donde se guardará en Firebase
+        storage_path = f"faces/{face_image.name}"  # Ruta donde se guardará en Firebase
         storage.child(storage_path).put(file_bytes)  # Subir la imagen local a Firebase
 
         # Obtener la URL de descarga de la imagen en Firebase
