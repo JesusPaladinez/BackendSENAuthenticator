@@ -9,29 +9,12 @@ from rest_framework.permissions import IsAuthenticated
 from firebase_admin import storage as admin_storage
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
-import io
 
 # Librerías para el reconocimiento facial
 from app_senauthenticator.utils.face_utils import convert_to_ndarray, detect_face_dlib, crop_face
 import os
 import cv2
 import numpy as np
-import pyrebase
-
-
-config = {
-    "apiKey": os.getenv('FIREBASE_API_KEY'),
-    "authDomain": "projectstoragesenauthenticator.firebaseapp.com",
-    "projectId": "projectstoragesenauthenticator",
-    "storageBucket": "projectstoragesenauthenticator.appspot.com", 
-    "messagingSenderId": "371522976959",
-    "appId": "1:371522976959:web:f99bc5b20a440aaac5da0a",
-    "measurementId": "G-5TEEM4Y3P3",
-    "databaseURL": "https://projectstoragesenauthenticator-default-rtdb.firebaseio.com/"
-}
-
-firebase_storage = pyrebase.initialize_app(config)
-storage = firebase_storage.storage()
 
 
 @api_view(['GET', 'POST'])
@@ -65,20 +48,6 @@ def obtener_usuarios(request):
 @api_view(['POST'])
 def crear_usuario(request):
     try:
-        # Procesar el registro facial si se proporciona una imagen
-        if 'face_register' in request.FILES:
-            face_image = request.FILES['face_register']
-            # image_url = registrar_rostro(face_image, usuario)
-            image_url = registrar_rostro(face_image)
-            
-            # Validar la URL antes de asignarla
-            validate = URLValidator()
-            try:
-                validate(image_url)
-                request.data['face_register'] = image_url
-            except ValidationError:
-                return Response({'error': 'La URL generada para el registro facial no es válida.'}, status=status.HTTP_400_BAD_REQUEST)
-
         numero_documento = request.data.get('numero_documento_usuario')
         if not numero_documento:
             return Response({'error': 'El número de documento es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -106,6 +75,11 @@ def crear_usuario(request):
                 secure=True,
                 samesite='None'
             )
+
+            # Procesar el registro facial si se proporciona una imagen
+            if 'face_register' in request.FILES:
+                return registrar_rostro(request.FILES['face_register'], usuario_serializer)
+
             return response
         else:
             return Response(usuario_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -115,49 +89,42 @@ def crear_usuario(request):
         return Response({'error': f'Error al crear el usuario: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# def registrar_rostro(face_image, usuario):
-def registrar_rostro(face_image):
+def registrar_rostro(face_register, usuario_serializer):
     try:
         # Convertir la imagen a ndarray
-        # face_ndarray = convert_to_ndarray(face_image)
+        face_ndarray = convert_to_ndarray(face_register)
+
+        # Convertir la imagen a formato BGR
+        face_bgr = cv2.cvtColor(face_ndarray, cv2.COLOR_RGB2BGR)
 
         # Detectar el rostro en la imagen
-        # face_detected = detect_face_dlib(face_image)
-        # if face_detected is None:
-        #     raise ValueError("No se detectó ningún rostro en la imagen proporcionada.")
-        
-        # Convertir la imagen a escala de grises
-        # face_gray = cv2.cvtColor(face_detected, cv2.COLOR_BGR2GRAY)
-        
-        file_bytes = face_image.read()
+        face_detected = detect_face_dlib(face_bgr)
+        if face_detected is None:
+            raise ValueError("No se detectó ningún rostro en la imagen proporcionada.")
 
         # Recortar el rostro detectado
-        # cropped_face = crop_face(face_ndarray, face_detected)
+        cropped_face = crop_face(face_bgr, face_detected)
 
-        # # Guardar la imagen final en formato JPG localmente
-        # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        # face_directory = os.path.join(BASE_DIR, 'database', 'faces')
-        # os.makedirs(face_directory, exist_ok=True)
-        # nombre_completo = f"{usuario.first_name} - {usuario.numero_documento_usuario}"
-        # face_filename = f"{nombre_completo}.jpg"
-        # face_path = os.path.join(face_directory, face_filename)
-        # cv2.imwrite(face_path, cropped_face)
+        # Guardar la imagen final en formato JPG localmente
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        face_directory = os.path.join(BASE_DIR, 'database', 'faces')
+        os.makedirs(face_directory, exist_ok=True)
+        nombre_completo = f"{usuario_serializer.validated_data.get('first_name')} - {usuario_serializer.validated_data.get('numero_documento_usuario')}"
+        face_filename = f"{nombre_completo}.jpg"
+        face_path = os.path.join(face_directory, face_filename)
+        cv2.imwrite(face_path, cropped_face)
 
-        # Codificar la imagen en formato JPEG y obtener los bytes
-        # _, buffer = cv2.imencode('.jpg', cropped_face)
-        # file_bytes = buffer.tobytes()
+        # Guardar la imagen en formato ndarray en la carpeta 'matrices' localmente
+        matrices_directory = os.path.join(BASE_DIR, 'database', 'matrices')
+        os.makedirs(matrices_directory, exist_ok=True)
+        matrix_filename = f"{nombre_completo}.npy"
+        matrix_path = os.path.join(matrices_directory, matrix_filename)
+        np.save(matrix_path, face_bgr)
 
-        # Subir la imagen a Firebase Storage
-        storage_path = f"faces/{face_image.name}"  # Ruta donde se guardará en Firebase
-        storage.child(storage_path).put(file_bytes)  # Subir la imagen local a Firebase
-
-        # Obtener la URL de descarga de la imagen en Firebase
-        face_url = storage.child(storage_path).get_url(None)
-
-        return face_url
+        return Response({"message": "Rostro registrado correctamente."}, status=status.HTTP_200_OK)
 
     except Exception as e:
-        raise Exception(f"Error al registrar el rostro: {str(e)}")
+        return Response({"error": f"Error al registrar el rostro: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
