@@ -20,5 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('app_senauthenticator.urls')),
-    path('api/password_reset/',include('django_rest_passwordrest.urls',namespace='password_rest')),
+    # path('api/password_reset/',include('django_rest_passwordreset.urls',namespace='password_rest')),
 ]

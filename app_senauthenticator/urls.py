@@ -41,10 +41,12 @@ urlpatterns = [
     path('ingreso/', ingreso.ingreso_controlador),
     path('ingreso/<int:pk>/', ingreso.ingreso_controlador),
     path('inicioSesion/', usuario.inicio_sesion),
+    
     # recuperar contraseña
-    path('forgotpassword/', recuperar_contraseña.ForgotPassword, name='forgot-password'),
-    path('passwordresetsent/<str:reset_id>/', recuperar_contraseña.PasswordResetSent, name='password-reset-sent'),
-    path('resetpassword/<str:reset_id>/', recuperar_contraseña.ResetPassword, name='reset-password'),
+    path('forgotpassword/', recuperar_contraseña.ForgotPassword.as_view(), name='forgot-password'),
+    path('passwordresetsent/<str:reset_id>/', recuperar_contraseña.PasswordResetSent.as_view(), name='password-reset-sent'),
+    path('resetpassword/<str:reset_id>/', recuperar_contraseña.ResetPassword.as_view(), name='reset-password'),
+    # path('password_reset/',include('django_rest_passwordreset.urls',namespace='password_rest')),
     # path('autenticacionFacial/', AutenticacionFacial.as_view())
 ]
 
