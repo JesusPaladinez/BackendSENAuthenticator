@@ -70,7 +70,7 @@ class Usuario(AbstractUser):
     genero_usuario=models.CharField(max_length=9, choices=genero, blank=True, null=True, db_column='genero_usuario')  
     rol_usuario = models.CharField(max_length=20, choices=tipo_rol, blank=True, null=True, db_column='rol_usuario') 
     ficha_usuario=models.ForeignKey(Ficha, on_delete=models.PROTECT, blank=True, null=True, db_column='ficha_usuario')
-    face_register = models.URLField(blank=True, null=True, max_length=500, db_column='face_register')
+    face_register = models.ImageField(blank=True, null=True, max_length=500, db_column='face_register')
 
     # nombre_usuario=models.CharField(max_length=50, db_column='nombre_usuario')
     # apellidos_usuario=models.CharField(max_length=50, db_column='apellidos_usuario')
@@ -142,10 +142,11 @@ class Ingreso(models.Model):
 
 
 class Objeto(models.Model):
+    nombre_objeto = models.CharField(max_length=20, db_column='nombre_objeto')
     marca_objeto = models.CharField(max_length=20, db_column='marca_objeto')
-    modelo_objeto = models.CharField(max_length=20, db_column='modelo_objeto')
+    codigo_objeto = models.CharField(max_length=20, db_column='codigo_objeto')
     descripcion_objeto = models.TextField(db_column='descripcion_objeto')
-    foto_objeto = models.URLField(max_length=300,db_column='foto_objeto', blank=True, null=True)  # Guardarás la URL aquí
+    color_objeto = models.CharField(max_length=300,db_column='color_objeto', blank=True, null=True) 
     usuario_objeto = models.ForeignKey(Usuario, on_delete=models.PROTECT, db_column='usuario_objeto')
 
     def __str__(self) -> str:

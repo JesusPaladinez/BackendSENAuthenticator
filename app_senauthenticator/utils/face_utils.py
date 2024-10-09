@@ -104,7 +104,7 @@ def read_face_database(database_path: str) -> Tuple[List[np.ndarray], List[str],
                 face_db.append(face_data)
                 face_names.append(os.path.splitext(file)[0])
 
-    return face_db, face_names, f'Comparando {len(face_db)} rostros!'   
+    return face_db, face_names, f'Comparando {len(face_db)} rostros!'
 
 
 def face_matching(current_face: np.ndarray, face_db: List[np.ndarray], name_db: List[str]) -> Tuple[bool, str]:
